@@ -1,0 +1,2056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skyware Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;user-select:none}
+:root{
+  --bg:#0a0a0f;--bg2:#10101a;--bg3:#1a1a28;--bg4:#22223a;--bg5:#2a2a45;
+  --accent:#6c63ff;--accent-hover:#7d75ff;--accent2:#ff6b6b;--accent3:#00d2aa;--accent4:#f59e0b;
+  --text:#e8e8f0;--text2:#8888aa;--text3:#55557a;
+  --border:rgba(255,255,255,0.06);--border2:rgba(108,99,255,0.35);--border3:rgba(255,255,255,0.12);
+  --radius:10px;--radius-lg:14px;
+  --shadow:0 8px 32px rgba(0,0,0,0.5);
+  --ease-spring:cubic-bezier(0.34,1.56,0.64,1);
+  --ease-out:cubic-bezier(0.16,1,0.3,1);
+}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif}
+
+/* ─── ANIMATIONS ─────────────────────────────────────────────────── */
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideInLeft{from{opacity:0;transform:translateX(-16px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideInRight{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+@keyframes heroSlide{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes cardStagger{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes progressFill{from{width:0}to{width:var(--target-width)}}
+@keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+@keyframes toastOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(20px)}}
+@keyframes glowPulse{0%,100%{box-shadow:0 0 0 0 rgba(108,99,255,0)}50%{box-shadow:0 0 16px 2px rgba(108,99,255,.25)}}
+@keyframes loadingDot{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
+
+/* ─── BOOTSPLASH ─────────────────────────────────────────────────── */
+@keyframes splashFadeIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+@keyframes splashLogoSlideUp{from{transform:translate(-50%,-50%) scale(1)}to{transform:translate(0,-50%) scale(.55)}}
+@keyframes splashFadeOut{from{opacity:1}to{opacity:0;pointer-events:none}}
+@keyframes splashRipple{0%{transform:scale(0);opacity:.6}100%{transform:scale(4);opacity:0}}
+#bootsplash{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column}
+#bootsplash.fade-out{animation:splashFadeOut .7s var(--ease-out) forwards}
+.splash-logo-wrap{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1001}
+.splash-logo-img{width:120px;height:120px;object-fit:contain;animation:splashFadeIn .6s var(--ease-out) .2s both;filter:drop-shadow(0 0 32px rgba(108,99,255,.6))}
+.splash-logo-wrap.slide-to-corner .splash-logo-img{filter:drop-shadow(0 0 8px rgba(108,99,255,.4))}
+.splash-ripple{position:absolute;width:80px;height:80px;border-radius:50%;border:2px solid var(--accent);top:50%;left:50%;transform:translate(-50%,-50%);animation:splashRipple 1.4s ease-out infinite}
+.splash-ripple:nth-child(2){animation-delay:.4s;border-color:var(--accent3)}
+.splash-ripple:nth-child(3){animation-delay:.8s;border-color:rgba(108,99,255,.3)}
+
+/* ─── WII-U STYLE BACKGROUND PARTICLES ──────────────────────────── */
+@keyframes floatBubble{0%{transform:translateY(0) scale(1);opacity:.18}50%{transform:translateY(-60px) scale(1.05);opacity:.28}100%{transform:translateY(0) scale(1);opacity:.18}}
+@keyframes driftLeft{0%{transform:translateX(0) rotate(0deg);opacity:.12}50%{transform:translateX(-30px) rotate(180deg);opacity:.22}100%{transform:translateX(0) rotate(360deg);opacity:.12}}
+@keyframes pulseRing{0%,100%{transform:scale(1);opacity:.1}50%{transform:scale(1.15);opacity:.2}}
+@keyframes twinkle{0%,100%{opacity:.05}50%{opacity:.2}}
+@keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(100vh)}}
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bg-bubble{position:absolute;border-radius:50%;pointer-events:none}
+.bg-ring{position:absolute;border-radius:50%;border:1px solid;pointer-events:none;animation:pulseRing 4s ease-in-out infinite}
+.bg-scanline{position:fixed;top:0;left:0;width:100%;height:2px;background:linear-gradient(90deg,transparent,rgba(108,99,255,.04),transparent);animation:scanline 8s linear infinite;z-index:0;pointer-events:none}
+.bg-dot{position:absolute;border-radius:50%;pointer-events:none;animation:twinkle 3s ease-in-out infinite}
+#bg-canvas::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(108,99,255,.04) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(0,210,170,.03) 0%,transparent 50%);pointer-events:none}
+
+/* ─── MUSIC PLAYER (sidebar bottom) ─────────────────────────────── */
+.music-player{padding:10px 8px;border-top:1px solid var(--border);flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px}
+.music-btns{display:flex;align-items:center;gap:4px}
+.music-btn{width:28px;height:28px;border-radius:7px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;color:var(--text2)}
+.music-btn:hover{background:var(--bg3);color:var(--text);transform:scale(1.1)}
+.music-btn:active{transform:scale(.92)}
+.music-btn.play-pause{width:32px;height:32px;background:var(--accent);border-radius:50%;color:#fff}
+.music-btn.play-pause:hover{background:var(--accent-hover);box-shadow:0 0 12px rgba(108,99,255,.5);transform:scale(1.12)}
+.music-btn svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.music-btn.play-pause svg{width:11px;height:11px;fill:currentColor;stroke:none}
+.music-vol{width:44px;height:3px;background:var(--bg5);border-radius:2px;cursor:pointer;position:relative;overflow:hidden}
+.music-vol-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent3));border-radius:2px;transition:width .15s;pointer-events:none}
+.music-label{font-size:9px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:52px;transition:color .3s}
+.music-label.playing{color:var(--accent3);animation:pulse 2s ease-in-out infinite}
+.music-eq{display:flex;gap:2px;align-items:flex-end;height:12px}
+.music-eq-bar{width:3px;background:var(--accent3);border-radius:1px;transition:height .1s}
+.music-eq-bar:nth-child(1){animation:eqBar1 .6s ease-in-out infinite}
+.music-eq-bar:nth-child(2){animation:eqBar2 .5s ease-in-out infinite .1s}
+.music-eq-bar:nth-child(3){animation:eqBar3 .7s ease-in-out infinite .05s}
+@keyframes eqBar1{0%,100%{height:3px}50%{height:10px}}
+@keyframes eqBar2{0%,100%{height:7px}50%{height:3px}}
+@keyframes eqBar3{0%,100%{height:5px}50%{height:11px}}
+.music-eq.paused .music-eq-bar{animation:none;height:3px}
+
+/* ─── TITLEBAR ─────────────────────────────────────────────────── */
+#titlebar{
+  -webkit-app-region:drag;
+  height:36px;background:var(--bg2);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 12px;gap:12px;flex-shrink:0;
+  position:relative;z-index:100;
+  animation:fadeIn .3s ease;
+}
+.title-logo-img{height:22px;width:auto;object-fit:contain;opacity:.92;transition:opacity .2s}
+.title-logo-img:hover{opacity:1}
+.title-spacer{flex:1}
+.win-btns{-webkit-app-region:no-drag;display:flex;gap:4px;align-items:center}
+.win-btn{width:28px;height:20px;border-radius:4px;border:none;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;background:transparent;color:var(--text2);transition:all .15s}
+.win-btn svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.win-btn:hover{background:var(--bg4);color:var(--text)}
+.win-btn.close:hover{background:#e74c3c;color:#fff}
+.scan-status{font-size:11px;color:var(--text2);display:flex;align-items:center;gap:6px}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--accent3);animation:pulse 2s infinite;flex-shrink:0}
+
+/* ─── LAYOUT ───────────────────────────────────────────────────── */
+#app{display:flex;height:calc(100vh - 36px);overflow:hidden}
+
+/* ─── SIDEBAR ──────────────────────────────────────────────────── */
+#sidebar{
+  width:68px;background:var(--bg2);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:4px;flex-shrink:0;z-index:10;
+  animation:slideInLeft .35s var(--ease-out);
+}
+.sicon{
+  width:44px;height:44px;border-radius:10px;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;cursor:pointer;transition:background .2s, transform .15s var(--ease-spring);
+  position:relative;flex-shrink:0;gap:3px;
+}
+.sicon:hover{background:var(--bg3);transform:scale(1.05)}
+.sicon:active{transform:scale(.95)}
+.sicon.active{background:rgba(108,99,255,.2)}
+.sicon.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:26px;background:var(--accent);border-radius:0 3px 3px 0;transition:height .2s var(--ease-spring)}
+.sicon svg{width:19px;height:19px;flex-shrink:0;fill:none;stroke:var(--text2);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;transition:stroke .2s}
+.sicon .s-label{font-size:9px;color:var(--text2);font-weight:500;letter-spacing:.3px;transition:color .2s}
+.sicon.active svg{stroke:var(--accent)}
+.sicon.active .s-label{color:var(--accent)}
+.sicon:hover svg{stroke:var(--text)}
+.sicon:hover .s-label{color:var(--text)}
+.spc{flex:1}
+.sidebar-divider{width:32px;height:1px;background:var(--border);margin:4px 0}
+
+/* ─── LEFT PANEL ────────────────────────────────────────────────── */
+#left{width:240px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;animation:slideInLeft .4s var(--ease-out)}
+.panel-head{padding:16px 14px 10px;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:600;letter-spacing:2px;color:var(--text2);text-transform:uppercase;display:flex;align-items:center;justify-content:space-between}
+.panel-count{font-size:11px;color:var(--text3);font-family:'Inter',sans-serif;font-weight:400;letter-spacing:0;transition:color .3s}
+#search-wrap{padding:0 10px 8px}
+.search-inner{position:relative}
+.search-ico{position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:.35;pointer-events:none}
+.search-ico svg{width:13px;height:13px;stroke:var(--text);fill:none;stroke-width:2;stroke-linecap:round}
+#search{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 10px 7px 30px;color:var(--text);font-size:12px;outline:none;font-family:'Inter',sans-serif;transition:border-color .2s, background .2s, box-shadow .2s}
+#search:focus{border-color:var(--accent);background:var(--bg4);box-shadow:0 0 0 3px rgba(108,99,255,.12)}
+#search::placeholder{color:var(--text3)}
+.filter-row{display:flex;gap:5px;padding:0 10px 8px;flex-wrap:wrap}
+.ftag{padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;border:1px solid var(--border);color:var(--text2);cursor:pointer;transition:all .2s;white-space:nowrap}
+.ftag:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
+.ftag.on{background:rgba(108,99,255,.18);border-color:var(--accent);color:var(--accent)}
+.list-sort{display:flex;gap:4px;padding:0 10px 6px}
+.lsort{flex:1;padding:4px 6px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;font-size:10px;color:var(--text2);cursor:pointer;text-align:center;transition:all .2s;font-family:'Inter',sans-serif}
+.lsort:hover,.lsort.on{background:var(--bg4);color:var(--text);border-color:var(--border3)}
+#game-list{flex:1;overflow-y:auto;padding:0 6px 10px}
+#game-list::-webkit-scrollbar{width:3px}
+#game-list::-webkit-scrollbar-track{background:transparent}
+#game-list::-webkit-scrollbar-thumb{background:var(--bg5);border-radius:2px}
+
+/* Skeleton loading */
+.skeleton{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg4) 50%,var(--bg3) 75%);background-size:400px 100%;animation:shimmer 1.4s infinite;border-radius:5px}
+
+.g-item{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:8px;cursor:pointer;transition:background .2s,border-color .2s,transform .15s var(--ease-spring);border:1px solid transparent}
+.g-item-anim{animation:slideInLeft .3s var(--ease-out) both}
+.g-item:hover{background:var(--bg3);transform:translateX(3px)}
+.g-item:active{transform:translateX(1px) scale(.99)}
+.g-item.active{background:rgba(108,99,255,.1);border-color:var(--border2)}
+.g-thumb{width:40px;height:28px;border-radius:5px;flex-shrink:0;overflow:hidden;background:var(--bg4)}
+.g-thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s ease}
+.g-item:hover .g-thumb img{transform:scale(1.08)}
+.g-info{flex:1;min-width:0}
+.g-name{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
+.g-meta{font-size:10px;color:var(--text2);display:flex;align-items:center;gap:5px;margin-top:1px}
+.src-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.dot-steam{background:#1b9ee6}.dot-epic{background:#c0a0ff}.dot-mc{background:#4caf50}.dot-hy{background:var(--accent4)}
+.g-fav{color:var(--accent2);font-size:11px;flex-shrink:0;opacity:.8}
+.g-play{width:20px;height:20px;border-radius:5px;background:var(--accent);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s,transform .15s var(--ease-spring);flex-shrink:0}
+.g-item:hover .g-play,.g-item.active .g-play{opacity:1}
+.g-item:hover .g-play{transform:scale(1.1)}
+
+/* ─── MAIN ──────────────────────────────────────────────────────── */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;animation:fadeIn .4s ease}
+
+#topbar{display:flex;align-items:center;padding:10px 18px;gap:14px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg2)}
+.np-wrap{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.np-thumb{width:36px;height:24px;border-radius:5px;overflow:hidden;background:var(--bg3);flex-shrink:0;transition:transform .2s var(--ease-spring)}
+.np-thumb:hover{transform:scale(1.08)}
+.np-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.np-text{min-width:0}
+.np-label{color:var(--text2);font-size:10px;letter-spacing:.8px;text-transform:uppercase}
+.np-name{font-weight:500;color:var(--text);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px;transition:color .2s}
+.topbtns{display:flex;gap:7px;align-items:center;flex-shrink:0}
+.tbtn{padding:6px 14px;border-radius:7px;font-size:12px;font-weight:500;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:all .2s;white-space:nowrap}
+.tbtn:active{transform:scale(.96)}
+.tbtn-outline{background:transparent;border:1px solid var(--border2);color:var(--accent)}
+.tbtn-outline:hover{background:rgba(108,99,255,.12);transform:translateY(-1px)}
+.tbtn-solid{background:var(--accent);color:#fff}
+.tbtn-solid:hover{background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 4px 16px rgba(108,99,255,.4)}
+.tbtn-sm{padding:5px 10px;font-size:11px}
+.view-toggle{display:flex;gap:3px;background:var(--bg3);border-radius:7px;padding:3px}
+.view-btn{width:26px;height:22px;border-radius:5px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.view-btn svg{width:13px;height:13px;stroke:var(--text2);fill:none;stroke-width:1.5;stroke-linecap:round;transition:stroke .2s}
+.view-btn.active{background:var(--bg5)}
+.view-btn.active svg{stroke:var(--text)}
+.view-btn:hover svg{stroke:var(--text)}
+
+/* Hero */
+#hero{flex-shrink:0;padding:14px 16px 0;display:flex;gap:12px}
+.hero-card{flex:1;height:160px;border-radius:var(--radius-lg);border:1px solid var(--border);padding:16px;display:flex;flex-direction:column;justify-content:flex-end;cursor:pointer;transition:border-color .3s,transform .3s var(--ease-spring),box-shadow .3s;position:relative;overflow:hidden;background-size:cover;background-position:center;animation:heroSlide .5s var(--ease-out) both}
+.hero-card:nth-child(1){animation-delay:.05s}
+.hero-card:nth-child(2){animation-delay:.12s}
+.hero-card:nth-child(3){animation-delay:.19s}
+.hero-card:hover{border-color:var(--border2);transform:translateY(-4px) scale(1.01);box-shadow:0 12px 40px rgba(0,0,0,.6)}
+.hero-card::after{content:'';position:absolute;inset:0;background:rgba(108,99,255,.0);transition:background .3s;pointer-events:none}
+.hero-card:hover::after{background:rgba(108,99,255,.05)}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,20,.1) 0%,rgba(10,10,20,.88) 100%);pointer-events:none;transition:opacity .3s}
+.hero-card:hover .hero-overlay{opacity:.9}
+.hero-content{position:relative;z-index:1;transform:translateY(0);transition:transform .3s var(--ease-out)}
+.hero-card:hover .hero-content{transform:translateY(-3px)}
+.hero-src-badge{display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;letter-spacing:.5px;margin-bottom:6px;text-transform:uppercase}
+.hero-title{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:#fff;line-height:1.1;text-shadow:0 1px 8px rgba(0,0,0,.6)}
+.hero-sub{font-size:11px;color:rgba(255,255,255,.65);margin-top:3px}
+.hero-launch{margin-top:8px;padding:5px 13px;background:var(--accent);border:none;border-radius:6px;color:#fff;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;width:fit-content;transition:all .2s;letter-spacing:.3px;opacity:0;transform:translateY(4px)}
+.hero-card:hover .hero-launch{opacity:1;transform:translateY(0)}
+.hero-launch:hover{background:var(--accent-hover);box-shadow:0 4px 12px rgba(108,99,255,.5)}
+.hero-launch:active{transform:scale(.95)}
+
+/* Content */
+#content{flex:1;overflow-y:auto;padding:14px 16px 20px}
+#content::-webkit-scrollbar{width:4px}
+#content::-webkit-scrollbar-thumb{background:var(--bg5);border-radius:2px}
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin:16px 0 10px;animation:fadeInUp .35s var(--ease-out) both}
+.sec-title{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text);display:flex;align-items:center;gap:8px}
+.sec-count{font-size:11px;color:var(--text3);font-family:'Inter',sans-serif;font-weight:400;letter-spacing:0}
+.sec-actions{display:flex;gap:6px;align-items:center}
+.sec-btn{padding:3px 9px;border-radius:6px;font-size:11px;color:var(--text2);cursor:pointer;border:1px solid transparent;transition:all .2s;background:transparent;font-family:'Inter',sans-serif}
+.sec-btn:hover{border-color:var(--border3);background:var(--bg3);color:var(--text);transform:translateY(-1px)}
+
+/* Grid */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.game-card{border-radius:var(--radius);border:1px solid var(--border);background:var(--bg3);cursor:pointer;transition:border-color .25s,transform .25s var(--ease-spring),box-shadow .25s;position:relative;overflow:hidden;animation:cardStagger .4s var(--ease-out) both}
+.game-card:hover{border-color:var(--border2);transform:translateY(-4px) scale(1.02);box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.game-card:active{transform:translateY(-2px) scale(1.01)}
+.game-card:hover .card-launch-overlay{opacity:1}
+.card-cover{width:100%;height:82px;object-fit:cover;display:block;background:var(--bg4);transition:transform .35s ease;transform-origin:center}
+.game-card:hover .card-cover{transform:scale(1.06)}
+.card-body{padding:9px 9px 8px}
+.card-title{font-size:12px;font-weight:500;color:var(--text);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-meta{font-size:10px;color:var(--text2);display:flex;align-items:center;gap:5px}
+.card-hours{color:var(--accent3);font-weight:500}
+.card-badge{position:absolute;top:6px;right:6px;padding:2px 6px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;backdrop-filter:blur(4px)}
+.badge-new{background:rgba(0,210,170,.2);color:var(--accent3);border:1px solid rgba(0,210,170,.4)}
+.badge-fav{background:rgba(255,107,107,.2);color:var(--accent2);border:1px solid rgba(255,107,107,.4)}
+.badge-play{background:rgba(108,99,255,.2);color:var(--accent);border:1px solid rgba(108,99,255,.4)}
+.card-fav-btn{position:absolute;top:6px;left:6px;width:22px;height:22px;border-radius:5px;background:rgba(0,0,0,.55);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;opacity:0;transition:opacity .2s,transform .15s var(--ease-spring);backdrop-filter:blur(4px)}
+.game-card:hover .card-fav-btn{opacity:1}
+.card-fav-btn:hover{transform:scale(1.2)}
+.card-fav-btn:active{transform:scale(.9)}
+.card-launch-overlay{position:absolute;inset:0 0 auto 0;height:82px;background:rgba(10,10,20,.5);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .25s;backdrop-filter:blur(3px)}
+.card-launch-btn{padding:6px 14px;background:var(--accent);border:none;border-radius:6px;color:#fff;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;transform:translateY(4px);transition:transform .25s var(--ease-spring),background .2s}
+.card-launch-overlay:not(.hidden) .card-launch-btn,.game-card:hover .card-launch-btn{transform:translateY(0)}
+.card-launch-btn:hover{background:var(--accent-hover)}
+
+/* List view */
+.games-list-view{display:flex;flex-direction:column;gap:4px}
+.list-game-row{display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:8px;border:1px solid transparent;background:var(--bg3);cursor:pointer;transition:all .2s;animation:fadeInUp .3s var(--ease-out) both}
+.list-game-row:hover{border-color:var(--border2);background:var(--bg4);transform:translateX(4px)}
+.list-game-row:active{transform:translateX(2px)}
+.list-thumb{width:60px;height:34px;border-radius:5px;overflow:hidden;background:var(--bg5);flex-shrink:0;transition:transform .2s var(--ease-spring)}
+.list-game-row:hover .list-thumb{transform:scale(1.05)}
+.list-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.list-name{flex:1;font-size:13px;font-weight:500;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.list-source{width:90px;font-size:11px;color:var(--text2);display:flex;align-items:center;gap:5px;flex-shrink:0}
+.list-hours{width:60px;font-size:12px;color:var(--accent3);font-weight:500;text-align:right;flex-shrink:0}
+.list-size{width:70px;font-size:11px;color:var(--text2);text-align:right;flex-shrink:0}
+.list-actions{display:flex;gap:5px;flex-shrink:0;opacity:0;transition:opacity .2s}
+.list-game-row:hover .list-actions{opacity:1}
+.list-act-btn{padding:4px 10px;border-radius:5px;font-size:10px;font-weight:500;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:all .2s}
+.list-act-btn:hover{transform:translateY(-1px)}
+.list-act-launch{background:var(--accent);color:#fff}
+.list-act-folder{background:var(--bg5);color:var(--text2);border:1px solid var(--border)}
+
+/* ─── RIGHT PANEL ───────────────────────────────────────────────── */
+#right{width:240px;background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;padding:14px 12px;animation:slideInRight .4s var(--ease-out)}
+#right::-webkit-scrollbar{width:3px}
+#right::-webkit-scrollbar-thumb{background:var(--bg5);border-radius:2px}
+.r-sec{margin-bottom:18px;animation:fadeInUp .4s var(--ease-out) both}
+.r-sec:nth-child(1){animation-delay:.1s}
+.r-sec:nth-child(2){animation-delay:.18s}
+.r-sec:nth-child(3){animation-delay:.26s}
+.r-sec:nth-child(4){animation-delay:.34s}
+.r-title{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text2);margin-bottom:10px}
+.stat-row{display:flex;gap:7px}
+.stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:11px 12px;flex:1;transition:border-color .2s,transform .2s var(--ease-spring)}
+.stat-card:hover{border-color:var(--border3);transform:translateY(-2px)}
+.stat-num{font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;color:var(--text);line-height:1}
+.stat-label{font-size:10px;color:var(--text2);margin-top:3px;line-height:1.3}
+
+/* Source rows with SVG icons */
+.source-row{display:flex;align-items:center;gap:8px;padding:7px 6px;border-radius:7px;transition:background .2s;cursor:default}
+.source-row:hover{background:var(--bg3)}
+.src-ico{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+.src-ico svg{width:16px;height:16px;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.src-ico-steam{background:rgba(27,158,230,.15);border:1px solid rgba(27,158,230,.25)}
+.src-ico-steam svg{stroke:#1b9ee6}
+.src-ico-epic{background:rgba(192,160,255,.15);border:1px solid rgba(192,160,255,.25)}
+.src-ico-epic svg{stroke:#c0a0ff;fill:#c0a0ff}
+.src-ico-minecraft{background:rgba(76,175,80,.15);border:1px solid rgba(76,175,80,.25)}
+.src-ico-minecraft svg{stroke:#4caf50}
+.src-ico-hytale{background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.25)}
+.src-ico-hytale svg{stroke:var(--accent4)}
+.src-name{font-size:12px;font-weight:500;flex:1;color:var(--text)}
+.src-count{font-size:11px;color:var(--text2);font-family:'Rajdhani',sans-serif;font-weight:600;font-size:13px}
+
+.prog-wrap{margin-bottom:9px}
+.prog-label{display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px}
+.prog-label-name{color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
+.prog-label-val{color:var(--accent3);font-weight:500;flex-shrink:0}
+.prog-bar{height:4px;background:var(--bg5);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--accent3));transform-origin:left;animation:progressFill .8s var(--ease-out) both}
+.act-item{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);transition:background .2s}
+.act-item:last-child{border:none}
+.act-thumb{width:28px;height:20px;border-radius:4px;overflow:hidden;background:var(--bg4);flex-shrink:0;margin-top:1px;transition:transform .2s var(--ease-spring)}
+.act-item:hover .act-thumb{transform:scale(1.08)}
+.act-thumb img{width:100%;height:100%;object-fit:cover}
+.act-text{font-size:11px;color:var(--text2);line-height:1.5}
+.act-text strong{color:var(--text);font-weight:500}
+.act-time{font-size:10px;color:var(--text3);margin-top:1px}
+
+/* ─── CUSTOM FOLDERS ──────────────────────────────────────────────── */
+.folders-section{padding:8px 6px 4px;border-top:1px solid var(--border);margin-top:4px}
+.folders-head{display:flex;align-items:center;justify-content:space-between;padding:2px 4px 6px;cursor:default}
+.folders-head-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.8px}
+.folders-head-add{width:18px;height:18px;border-radius:4px;border:none;background:transparent;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:14px;line-height:1;padding:0}
+.folders-head-add:hover{background:var(--bg3);color:var(--accent)}
+.folder-item{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:7px;cursor:pointer;transition:all .15s;border:1px solid transparent;font-size:12px;color:var(--text2);position:relative}
+.folder-item:hover{background:var(--bg3);color:var(--text)}
+.folder-item.active{background:rgba(108,99,255,.1);border-color:var(--border2);color:var(--text)}
+.folder-item-icon{font-size:13px;flex-shrink:0;width:16px;text-align:center}
+.folder-item-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.folder-item-count{font-size:10px;color:var(--text3);font-family:'Rajdhani',sans-serif;font-weight:600;flex-shrink:0}
+.folder-item-menu{width:16px;height:16px;border-radius:3px;border:none;background:transparent;color:var(--text3);cursor:pointer;display:none;align-items:center;justify-content:center;font-size:12px;padding:0;flex-shrink:0}
+.folder-item:hover .folder-item-menu{display:flex}
+.folder-item-menu:hover{color:var(--text);background:var(--bg4)}
+
+/* ─── ADD GAME BUTTON ─────────────────────────────────────────────── */
+.add-game-btn{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:7px;cursor:pointer;transition:all .15s;border:1px dashed var(--border);font-size:12px;color:var(--text3);margin:6px 6px 2px;background:transparent}
+.add-game-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(108,99,255,.06)}
+.add-game-btn svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;flex-shrink:0}
+
+/* ─── MODAL ────────────────────────────────────────────────────────── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,10,.85);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
+.modal-overlay.show{display:flex;animation:fadeIn .2s ease}
+.modal-box{background:var(--bg2);border:1px solid var(--border3);border-radius:14px;padding:24px;width:440px;max-width:calc(100vw - 40px);box-shadow:0 24px 80px rgba(0,0,0,.8);animation:scaleIn .25s var(--ease-spring) both}
+.modal-title{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;margin-bottom:6px}
+.modal-sub{font-size:12px;color:var(--text2);margin-bottom:20px;line-height:1.5}
+.modal-field{margin-bottom:14px}
+.modal-label{font-size:11px;font-weight:600;color:var(--text2);margin-bottom=5px;display:block;margin-bottom:5px;letter-spacing:.3px;text-transform:uppercase}
+.modal-input{width:100%;padding:9px 12px;background:var(--bg3);border:1px solid var(--border3);border-radius:8px;color:var(--text);font-size:13px;font-family:'Inter',sans-serif;outline:none;transition:border-color .2s;-webkit-user-select:text;user-select:text}
+.modal-input:focus{border-color:var(--accent)}
+.modal-input::placeholder{color:var(--text3)}
+.modal-browse-row{display:flex;gap:8px}
+.modal-browse-row .modal-input{flex:1}
+.modal-browse-btn{padding:9px 14px;background:var(--bg3);border:1px solid var(--border3);border-radius:8px;color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;white-space:nowrap;font-family:'Inter',sans-serif}
+.modal-browse-btn:hover{border-color:var(--border2);color:var(--text);background:var(--bg4)}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+.modal-btn{padding:8px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:all .2s}
+.modal-btn:active{transform:scale(.95)}
+.modal-btn-primary{background:var(--accent);color:#fff}
+.modal-btn-primary:hover{background:var(--accent-hover);box-shadow:0 4px 16px rgba(108,99,255,.4)}
+.modal-btn-ghost{background:var(--bg3);color:var(--text2);border:1px solid var(--border3)}
+.modal-btn-ghost:hover{color:var(--text);border-color:var(--border2)}
+.modal-btn-danger{background:rgba(255,107,107,.15);color:var(--accent2);border:1px solid rgba(255,107,107,.3)}
+.modal-btn-danger:hover{background:rgba(255,107,107,.25)}
+.modal-emoji-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.modal-emoji-opt{width:32px;height:32px;border-radius:7px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .15s}
+.modal-emoji-opt:hover,.modal-emoji-opt.selected{border-color:var(--accent);background:rgba(108,99,255,.15)}
+
+/* ─── FOLDER CONTEXT MENU ──────────────────────────────────────────── */
+.ctx-menu{display:none;position:fixed;background:var(--bg3);border:1px solid var(--border3);border-radius:9px;padding:4px;min-width:140px;box-shadow:0 8px 30px rgba(0,0,0,.5);z-index:600;animation:scaleIn .15s var(--ease-spring)}
+.ctx-menu.show{display:block}
+.ctx-item{padding:7px 12px;border-radius:6px;font-size:12px;cursor:pointer;color:var(--text2);transition:all .15s;display:flex;align-items:center;gap:8px}
+.ctx-item:hover{background:var(--bg4);color:var(--text)}
+.ctx-item.danger{color:var(--accent2)}
+.ctx-item.danger:hover{background:rgba(255,107,107,.1)}
+#detail{display:none;position:fixed;inset:0;background:rgba(0,0,10,.8);z-index:200;overflow-y:auto;padding:28px;backdrop-filter:blur(8px)}
+#detail.show{display:block;animation:fadeIn .25s ease}
+.det-inner{max-width:760px;margin:0 auto;background:var(--bg2);border:1px solid var(--border3);border-radius:16px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.8);animation:scaleIn .3s var(--ease-spring) both}
+.det-banner{width:100%;height:180px;object-fit:cover;display:block;background:var(--bg3)}
+.det-body{padding:24px}
+.det-back{display:inline-flex;align-items:center;gap:7px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:500;margin-bottom:18px;padding:5px 10px;border-radius:6px;border:1px solid var(--border2);background:rgba(108,99,255,.08);transition:all .2s}
+.det-back:hover{background:rgba(108,99,255,.18);transform:translateX(-2px)}
+.det-back svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round}
+.det-hero-row{display:flex;gap:20px;margin-bottom:22px}
+.det-cover{width:100px;height:100px;border-radius:12px;overflow:hidden;border:1px solid var(--border3);flex-shrink:0;background:var(--bg3);transition:transform .3s var(--ease-spring)}
+.det-cover:hover{transform:scale(1.04)}
+.det-cover img{width:100%;height:100%;object-fit:cover;display:block}
+.det-info{flex:1}
+.det-name{font-family:'Rajdhani',sans-serif;font-size:30px;font-weight:700;line-height:1.1}
+.det-source-line{display:flex;align-items:center;gap:8px;margin:8px 0}
+.det-src-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.det-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.det-tag{padding:3px 9px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;font-size:11px;color:var(--text2);transition:all .2s}
+.det-tag:hover{border-color:var(--border3);color:var(--text)}
+.det-desc{font-size:13px;color:var(--text2);line-height:1.7;max-width:480px;-webkit-user-select:text;user-select:text}
+.det-actions{display:flex;gap:9px;margin-top:16px;flex-wrap:wrap}
+.det-btn{padding:8px 18px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:all .2s;letter-spacing:.3px}
+.det-btn:active{transform:scale(.95)}
+.det-btn-primary{background:var(--accent);color:#fff}
+.det-btn-primary:hover{background:var(--accent-hover);transform:translateY(-2px);box-shadow:0 6px 20px rgba(108,99,255,.4)}
+.det-btn-ghost{background:var(--bg3);color:var(--text);border:1px solid var(--border3)}
+.det-btn-ghost:hover{border-color:var(--border2);background:var(--bg4);transform:translateY(-1px)}
+.det-btn-fav{background:rgba(255,107,107,.12);color:var(--accent2);border:1px solid rgba(255,107,107,.3)}
+.det-btn-fav:hover{background:rgba(255,107,107,.22);transform:translateY(-1px)}
+.det-btn-fav.active{background:rgba(255,107,107,.25);border-color:rgba(255,107,107,.6)}
+.det-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.det-stat{background:var(--bg3);border-radius:var(--radius);padding:12px;border:1px solid var(--border);text-align:center;transition:all .2s var(--ease-spring);animation:fadeInUp .4s var(--ease-out) both}
+.det-stat:hover{transform:translateY(-3px);border-color:var(--border3)}
+.det-stat:nth-child(1){animation-delay:.05s}
+.det-stat:nth-child(2){animation-delay:.1s}
+.det-stat:nth-child(3){animation-delay:.15s}
+.det-stat:nth-child(4){animation-delay:.2s}
+.det-stat-num{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--text)}
+.det-stat-label{font-size:10px;color:var(--text2);margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
+.det-divider{height:1px;background:var(--border);margin:16px 0}
+/* Launcher picker tabs */
+.det-tabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:0}
+.det-tab{padding:7px 14px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--text2);font-family:'Inter',sans-serif;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s}
+.det-tab:hover{color:var(--text)}
+.det-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.det-tab-content{display:none}.det-tab-content.active{display:block}
+.launcher-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-top:4px}
+.launcher-card{padding:12px 10px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;transition:all .2s var(--ease-spring);text-align:center;position:relative;overflow:hidden}
+.launcher-card:hover{border-color:var(--border2);background:var(--bg4);transform:translateY(-3px);box-shadow:0 6px 20px rgba(0,0,0,.4)}
+.launcher-card:active{transform:translateY(-1px)}
+.launcher-card.unavailable{opacity:.4;cursor:not-allowed}
+.launcher-card.unavailable:hover{transform:none;border-color:var(--border);background:var(--bg3);box-shadow:none}
+.launcher-icon{font-size:26px;margin-bottom:6px;display:block;line-height:1}
+.launcher-name{font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.launcher-status{font-size:9px;margin-top:3px;font-weight:500;letter-spacing:.3px}
+.launcher-status.found{color:var(--accent3)}
+.launcher-status.notfound{color:var(--text3)}
+.launcher-scanning{display:flex;align-items:center;justify-content:center;gap:8px;padding:20px;color:var(--text2);font-size:12px}
+.launcher-scan-spinner{width:14px;height:14px;border:2px solid var(--bg5);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+.det-path{font-size:11px;color:var(--text2);font-family:'Inter',sans-serif;display:flex;align-items:flex-start;gap:6px;-webkit-user-select:text;user-select:text}
+.det-path-label{color:var(--text3);flex-shrink:0;padding-top:1px}
+.det-path-val{color:var(--text2);font-size:11px;word-break:break-all}
+
+/* ─── TOASTS ─────────────────────────────────────────────────────── */
+#toast-container{position:fixed;bottom:20px;right:20px;z-index:999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:10px 16px;font-size:12px;color:var(--text);display:flex;align-items:center;gap:8px;min-width:220px;max-width:340px;pointer-events:none;animation:toastIn .3s var(--ease-spring) both}
+.toast.removing{animation:toastOut .3s var(--ease-out) forwards}
+.toast-text{flex:1;line-height:1.4}
+.toast.success{border-color:rgba(0,210,170,.4);background:rgba(0,10,8,.9)}
+.toast.error{border-color:rgba(255,107,107,.4);background:rgba(10,0,0,.9)}
+.toast.info{border-color:var(--border2);background:rgba(5,5,20,.9)}
+.toast-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.toast.success .toast-dot{background:var(--accent3)}
+.toast.error .toast-dot{background:var(--accent2)}
+.toast.info .toast-dot{background:var(--accent)}
+
+/* ─── LOADING ─────────────────────────────────────────────────────── */
+#loading{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;animation:fadeIn .2s ease}
+#loading.hidden{animation:fadeIn .3s ease reverse forwards;pointer-events:none}
+.loading-logo{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:36px;letter-spacing:2px;animation:fadeInUp .5s var(--ease-out)}
+.loading-logo span{color:var(--accent)}
+.loading-spinner{width:36px;height:36px;border:2px solid var(--bg4);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+.loading-text{font-size:13px;color:var(--text2);animation:fadeIn .5s ease .2s both}
+.loading-dots{display:flex;gap:6px}
+.loading-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:loadingDot 1.4s ease-in-out infinite both}
+.loading-dot:nth-child(2){animation-delay:.16s;background:var(--accent3)}
+.loading-dot:nth-child(3){animation-delay:.32s;background:var(--accent4)}
+
+/* ─── EMPTY STATE ─────────────────────────────────────────────────── */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;color:var(--text2);text-align:center;animation:fadeInUp .4s var(--ease-out)}
+.empty-state svg{width:48px;height:48px;stroke:var(--text3);margin-bottom:16px;fill:none;stroke-width:1.5;stroke-linecap:round}
+.empty-state h3{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:600;color:var(--text3);margin-bottom:8px}
+.empty-state p{font-size:13px;color:var(--text3);max-width:300px;line-height:1.6}
+
+/* ─── HYTALE FALLBACK ─────────────────────────────────────────────── */
+.hytale-cover{width:100%;height:100%;background:linear-gradient(135deg,#1a0a2e 0%,#2d1b69 35%,#f59e0b 100%);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.hytale-cover::before{content:'H';font-family:'Rajdhani',sans-serif;font-size:60px;font-weight:700;color:rgba(245,158,11,.25);position:absolute}
+.hytale-cover-text{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:rgba(255,220,100,.9);letter-spacing:2px;position:relative;z-index:1;text-shadow:0 0 20px rgba(245,158,11,.8)}
+
+/* ─── SOURCE BADGES ─────────────────────────────────────────────── */
+.badge-steam{background:rgba(27,158,230,.15);color:#1b9ee6;border:1px solid rgba(27,158,230,.3)}
+.badge-epic{background:rgba(192,160,255,.15);color:#c0a0ff;border:1px solid rgba(192,160,255,.3)}
+.badge-minecraft{background:rgba(76,175,80,.15);color:#4caf50;border:1px solid rgba(76,175,80,.3)}
+.badge-hytale{background:rgba(245,158,11,.15);color:var(--accent4);border:1px solid rgba(245,158,11,.3)}
+
+/* Stagger helper for cards */
+.cards-grid .game-card:nth-child(n){animation-delay:calc(var(--i, 0) * 0.04s)}
+</style>
+</head>
+<body>
+
+<!-- Bootsplash -->
+<div id="bootsplash">
+  <div class="splash-ripple"></div>
+  <div class="splash-ripple"></div>
+  <div class="splash-ripple"></div>
+</div>
+<div class="splash-logo-wrap" id="splash-logo-wrap">
+  <img class="splash-logo-img" data-asset="icon.ico" src="../../assets/icon.ico" onerror="this.src='../../assets/icon.png'" alt="Skyware Hub">
+</div>
+
+<!-- Background ambient canvas (Wii U style) -->
+<div id="bg-canvas"></div>
+<div class="bg-scanline"></div>
+
+<!-- Legacy loading overlay (for scan feedback) -->
+<div id="loading" style="display:none">
+  <img style="height:56px;object-fit:contain;animation:fadeInUp .5s var(--ease-out)" src="../../assets/icon.ico" alt="Skyware Hub">
+  <div class="loading-dots">
+    <div class="loading-dot"></div>
+    <div class="loading-dot"></div>
+    <div class="loading-dot"></div>
+  </div>
+  <div class="loading-text" id="loading-text">Scanning your game library...</div>
+</div>
+
+<div id="titlebar">
+  <img class="title-logo-img" data-asset="icon.ico" src="../../assets/icon.ico" onerror="this.src='../../assets/icon.png'" alt="Skyware Hub">
+  <div class="scan-status">
+    <div class="pulse"></div>
+    <span id="scan-label">Ready</span>
+  </div>
+  <div class="title-spacer"></div>
+  <div class="win-btns">
+    <button class="win-btn" onclick="skyware.minimize()" title="Minimize">
+      <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
+    <button class="win-btn" onclick="skyware.maximize()" title="Maximize">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+    </button>
+    <button class="win-btn close" onclick="skyware.close()" title="Close">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+</div>
+
+<div id="app">
+  <!-- Sidebar -->
+  <div id="sidebar">
+    <div class="sicon active" onclick="switchView('library', this)" title="Library">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <div class="s-label">Library</div>
+    </div>
+    <div class="sicon" onclick="switchView('recent', this)" title="Recent">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <div class="s-label">Recent</div>
+    </div>
+    <div class="sicon" onclick="switchView('favorites', this)" title="Favorites">
+      <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      <div class="s-label">Favs</div>
+    </div>
+    <div class="sicon" onclick="switchView('stats', this)" title="Stats">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <div class="s-label">Stats</div>
+    </div>
+    <div class="spc"></div>
+    <div class="sidebar-divider"></div>
+    <div class="sicon" onclick="rescanGames()" title="Refresh Library">
+      <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      <div class="s-label">Scan</div>
+    </div>
+    <div class="sidebar-divider"></div>
+    <!-- Music Player -->
+    <div class="music-player">
+      <div class="music-eq" id="music-eq">
+        <div class="music-eq-bar"></div>
+        <div class="music-eq-bar"></div>
+        <div class="music-eq-bar"></div>
+      </div>
+      <div class="music-btns">
+        <button class="music-btn play-pause" id="music-play-btn" onclick="musicToggle()" title="Play/Pause">
+          <svg id="music-play-ico" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21"/></svg>
+        </button>
+      </div>
+      <div class="music-vol" id="music-vol-bar" onclick="musicSetVol(event)" title="Volume">
+        <div class="music-vol-fill" id="music-vol-fill" style="width:70%"></div>
+      </div>
+      <div class="music-label" id="music-label">Hub</div>
+    </div>
+  </div>
+
+  <!-- Left Panel -->
+  <div id="left">
+    <div class="panel-head">
+      Library
+      <span class="panel-count" id="left-count">0 games</span>
+    </div>
+    <div id="search-wrap">
+      <div class="search-inner">
+        <div class="search-ico"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+        <input id="search" type="text" placeholder="Search games..." oninput="onSearch(this.value)">
+      </div>
+    </div>
+    <div class="filter-row">
+      <div class="ftag on" onclick="setFilter('all', this)">All</div>
+      <div class="ftag" onclick="setFilter('steam', this)">Steam</div>
+      <div class="ftag" onclick="setFilter('epic', this)">Epic</div>
+      <div class="ftag" onclick="setFilter('minecraft', this)">Minecraft</div>
+      <div class="ftag" onclick="setFilter('hytale', this)">Hytale</div>
+    </div>
+    <div class="list-sort">
+      <div class="lsort on" onclick="setListSort('recent', this)">Recent</div>
+      <div class="lsort" onclick="setListSort('alpha', this)">A–Z</div>
+      <div class="lsort" onclick="setListSort('hours', this)">Hours</div>
+    </div>
+    <div id="game-list"></div>
+
+    <!-- Folders section -->
+    <div class="folders-section" id="folders-section">
+      <div class="folders-head">
+        <span class="folders-head-label">Folders</span>
+        <button class="folders-head-add" onclick="openCreateFolder()" title="New folder">+</button>
+      </div>
+      <div id="folders-list"></div>
+    </div>
+
+    <!-- Add Custom Game -->
+    <div class="add-game-btn" onclick="openAddGame()">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add Custom Game
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div id="main">
+    <div id="topbar">
+      <div class="np-wrap">
+        <div class="np-thumb" id="np-thumb"></div>
+        <div class="np-text">
+          <div class="np-label">Selected</div>
+          <div class="np-name" id="np-name">Pick a game</div>
+        </div>
+      </div>
+      <div class="topbtns">
+        <div class="view-toggle">
+          <button class="view-btn active" id="view-grid-btn" onclick="setViewMode('grid')" title="Grid view">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          </button>
+          <button class="view-btn" id="view-list-btn" onclick="setViewMode('list')" title="List view">
+            <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          </button>
+        </div>
+        <button class="tbtn tbtn-outline tbtn-sm" onclick="surpriseMe()">
+          <svg style="width:11px;height:11px;display:inline;vertical-align:middle;margin-right:4px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="8" cy="8" r="1" fill="currentColor"/><circle cx="16" cy="8" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="8" cy="16" r="1" fill="currentColor"/><circle cx="16" cy="16" r="1" fill="currentColor"/></svg>
+          Random
+        </button>
+        <button class="tbtn tbtn-solid tbtn-sm" id="quick-launch" onclick="launchSelected()">
+          <svg style="width:10px;height:10px;display:inline;vertical-align:middle;margin-right:3px;fill:#fff;stroke:none" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21"/></svg>
+          Launch
+        </button>
+      </div>
+    </div>
+
+    <div id="hero"></div>
+    <div id="content"></div>
+  </div>
+
+  <!-- Right Stats Panel -->
+  <div id="right">
+    <div class="r-sec">
+      <div class="r-title">Overview</div>
+      <div class="stat-row" style="margin-bottom:8px">
+        <div class="stat-card">
+          <div class="stat-num" id="stat-total">0</div>
+          <div class="stat-label">Games Found</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="stat-hours">0h</div>
+          <div class="stat-label">Total Hours</div>
+        </div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="stat-num" id="stat-favs">0</div>
+          <div class="stat-label">Favorites</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="stat-sources">0</div>
+          <div class="stat-label">Platforms</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="r-sec">
+      <div class="r-title">Platforms</div>
+      <div id="sources-list"></div>
+    </div>
+
+    <div class="r-sec">
+      <div class="r-title">Most Played</div>
+      <div id="playtime-list"></div>
+    </div>
+
+    <div class="r-sec">
+      <div class="r-title">Recent</div>
+      <div id="activity-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Detail Overlay -->
+<div id="detail">
+  <div class="det-inner">
+    <div id="det-content"></div>
+  </div>
+</div>
+
+<audio id="bg-music" loop preload="auto"></audio>
+
+<div id="toast-container"></div>
+
+<!-- Add Game Modal -->
+<div class="modal-overlay" id="modal-add-game">
+  <div class="modal-box">
+    <div class="modal-title">Add Custom Game</div>
+    <div class="modal-sub">Add any game or app by pointing to its executable.</div>
+    <div class="modal-field">
+      <label class="modal-label">Executable Path</label>
+      <div class="modal-browse-row">
+        <input class="modal-input" id="add-game-exe" placeholder="C:\Games\MyGame\game.exe" readonly>
+        <button class="modal-browse-btn" onclick="browseExe()">Browse…</button>
+      </div>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Display Name</label>
+      <input class="modal-input" id="add-game-name" placeholder="My Awesome Game">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Cover Image (optional)</label>
+      <div class="modal-browse-row">
+        <input class="modal-input" id="add-game-cover" placeholder="Leave blank for auto-generated cover" readonly>
+        <button class="modal-browse-btn" onclick="browseCover()">Browse…</button>
+      </div>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Icon</label>
+      <div class="modal-emoji-grid" id="add-game-emoji-grid"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-ghost" onclick="closeModal('modal-add-game')">Cancel</button>
+      <button class="modal-btn modal-btn-primary" onclick="submitAddGame()">Add Game</button>
+    </div>
+  </div>
+</div>
+
+<!-- Create/Edit Folder Modal -->
+<div class="modal-overlay" id="modal-create-folder">
+  <div class="modal-box">
+    <div class="modal-title" id="folder-modal-title">New Folder</div>
+    <div class="modal-sub">Organize your games into custom collections.</div>
+    <div class="modal-field">
+      <label class="modal-label">Folder Name</label>
+      <input class="modal-input" id="folder-name-input" placeholder="e.g. Shooters, Chill Games…" maxlength="32">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Icon</label>
+      <div class="modal-emoji-grid" id="folder-emoji-grid"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-ghost" onclick="closeModal('modal-create-folder')">Cancel</button>
+      <button class="modal-btn modal-btn-primary" id="folder-modal-save-btn" onclick="submitFolder()">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add to Folder Modal -->
+<div class="modal-overlay" id="modal-add-to-folder">
+  <div class="modal-box">
+    <div class="modal-title">Add to Folder</div>
+    <div class="modal-sub" id="add-to-folder-sub">Choose folders for this game.</div>
+    <div id="add-to-folder-list" style="display:flex;flex-direction:column;gap:6px;max-height:260px;overflow-y:auto;margin-bottom:4px"></div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-ghost" onclick="closeModal('modal-add-to-folder')">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- Context Menu -->
+<div class="ctx-menu" id="ctx-menu"></div>
+
+<script>
+// ─── SVG Icons for platform sources ────────────────────────────────────────
+const srcIcons = {
+  steam: `<svg viewBox="0 0 24 24" class="src-ico src-ico-steam">
+    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 5.52 4.48 10 10 10 5.52 0 10-4.48 10-10C22 6.48 17.52 2 12 2zm-1 14.5v-3.33l-3.17-1.3A3.5 3.5 0 1 1 11 9.5v.17l3.07 1.26A2.5 2.5 0 1 1 16.5 13h-.17l-1.16-2.83-2.67-1.1v3.43a2 2 0 1 1-2 0z"/></svg>
+  </svg>`,
+};
+
+// Platform icon SVGs - inline so no emoji needed
+function getSrcIcoHTML(src) {
+  const icons = {
+    steam: `<div class="src-ico src-ico-steam">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7a5 5 0 0 1 5 5"/><circle cx="12" cy="12" r="2" fill="#1b9ee6" stroke="none"/><path d="M7 12a5 5 0 0 0 3.5 4.75L8 19"/></svg>
+    </div>`,
+    epic: `<div class="src-ico src-ico-epic">
+      <svg viewBox="0 0 24 24"><polygon points="12 2 20 7 20 17 12 22 4 17 4 7" fill="rgba(192,160,255,.3)" stroke="#c0a0ff" stroke-width="1.5" stroke-linejoin="round"/><line x1="12" y1="2" x2="12" y2="22" stroke="#c0a0ff" stroke-width="1.5"/></svg>
+    </div>`,
+    minecraft: `<div class="src-ico src-ico-minecraft">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg>
+    </div>`,
+    hytale: `<div class="src-ico src-ico-hytale">
+      <svg viewBox="0 0 24 24"><polygon points="12 3 21 8 21 16 12 21 3 16 3 8" stroke-linejoin="round"/><polyline points="3 8 12 13 21 8"/><line x1="12" y1="13" x2="12" y2="21"/></svg>
+    </div>`,
+  };
+  return icons[src] || `<div class="src-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg></div>`;
+}
+
+// Cover image helper — returns img tag or styled fallback div
+function makeCoverSVG(colors, label, textColor) {
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="460" height="215" viewBox="0 0 460 215"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:${colors[0]}"/><stop offset="100%" style="stop-color:${colors[1]}"/></linearGradient></defs><rect width="460" height="215" fill="url(#g)"/><text x="230" y="140" font-family="Arial Black,sans-serif" font-size="96" font-weight="900" fill="${textColor}" opacity="0.35" text-anchor="middle">${label}</text></svg>`)}`;
+}
+
+const FALLBACK_COVERS = {
+  minecraft_java:    () => makeCoverSVG(['#1a4a1a','#2d8c2d'], 'MC', '#5dff5d'),
+  minecraft_bedrock: () => makeCoverSVG(['#1a3a4a','#1a7a3a'], 'BE', '#4dffaa'),
+  hytale:            () => makeCoverSVG(['#1a0a2e','#c47c00'], 'HY', '#fbbf24'),
+};
+
+function getGameCover(g) {
+  // Custom game with user-supplied cover image
+  if (g.source === 'custom') {
+    if (g.coverPath) return 'file:///' + g.coverPath;
+    return makeCoverSVG(['#2a1f4a','#1a1535'], g.icon || g.name.substring(0,2), '#fff');
+  }
+  // If cover is a valid data URI or http URL, use it
+  if (g.cover && (g.cover.startsWith('http') || g.cover.startsWith('file'))) return g.cover;
+  // Generate SVG fallback in renderer (avoids IPC serialization issues with large base64)
+  if (FALLBACK_COVERS[g.id]) return FALLBACK_COVERS[g.id]();
+  if (g.source === 'minecraft') return makeCoverSVG(['#1a4a1a','#2d8c2d'], 'MC', '#5dff5d');
+  if (g.source === 'hytale') return makeCoverSVG(['#1a0a2e','#c47c00'], 'HY', '#fbbf24');
+  return g.cover || '';
+}
+
+function coverHTML(g, cls, style='') {
+  const src = getGameCover(g);
+  if (!src) {
+    const letter = g.name.substring(0,2).toUpperCase();
+    return `<div class="${cls}" style="${style}"><div class="hytale-cover"><div class="hytale-cover-text">${letter}</div></div></div>`;
+  }
+  return `<img class="${cls}" style="${style}" src="${src}" alt="${g.name}" onerror="this.parentElement.innerHTML='<div class=hytale-cover><div class=hytale-cover-text>${g.name.substring(0,2).toUpperCase()}</div></div>'">`;
+}
+
+// ─── State ─────────────────────────────────────────────────────────────────
+let allGames = [];
+let selectedGame = null;
+let activeFilter = 'all';
+let sidebarAnimated = false;
+let searchQuery = '';
+let listSort = 'recent';
+let viewMode = 'grid';
+let currentView = 'library';
+let userData = { favorites: [], hoursMap: {}, notes: {} };
+
+const sourceConfig = {
+  steam:     { label: 'Steam',     color: '#1b9ee6', dotClass: 'dot-steam',  badgeClass: 'badge-steam' },
+  epic:      { label: 'Epic',      color: '#c0a0ff', dotClass: 'dot-epic',   badgeClass: 'badge-epic' },
+  minecraft: { label: 'Minecraft', color: '#4caf50', dotClass: 'dot-mc',     badgeClass: 'badge-minecraft' },
+  hytale:    { label: 'Hytale',    color: '#f59e0b', dotClass: 'dot-hy',     badgeClass: 'badge-hytale' },
+  custom:    { label: 'Custom',    color: '#a78bfa', dotClass: 'dot-custom', badgeClass: 'badge-custom' },
+};
+
+// ─── Init ────────────────────────────────────────────────────────────────────
+async function init() {
+  try {
+    userData = await skyware.loadUserData() || { favorites: [], hoursMap: {}, notes: {} };
+    await rescanGames();
+    await loadFoldersAndCustom();
+    ensureCustomFilterTag();
+    renderFoldersSidebar();
+    renderAll();
+    skyware.rpcSetLauncher().catch(() => {});
+  } catch (e) {
+    setLoadingText('Error: ' + e.message);
+    hideLoading();
+  }
+}
+
+async function rescanGames() {
+  setLoadingText('Scanning your games...');
+  document.getElementById('scan-label').textContent = 'Scanning...';
+  try {
+    allGames = await skyware.scanGames();
+    allGames = allGames.map(g => ({ ...g, fav: (userData.favorites || []).includes(g.id) }));
+    if (!selectedGame && allGames.length > 0) selectedGame = allGames[0];
+    renderAll();
+    document.getElementById('scan-label').textContent = `${allGames.length} games`;
+    toast(`Found ${allGames.length} game${allGames.length !== 1 ? 's' : ''}`, 'success');
+  } catch (e) {
+    toast('Scan failed: ' + e.message, 'error');
+    document.getElementById('scan-label').textContent = 'Scan failed';
+  }
+}
+
+function setLoadingText(t) { const el = document.getElementById('loading-text'); if(el) el.textContent = t; }
+function hideLoading() {
+  const el = document.getElementById('loading');
+  if(el){ el.classList.add('hidden'); setTimeout(() => el.style.display = 'none', 400); }
+}
+
+// ─── Background Ambient Particles (Wii U style) ───────────────────────────────
+function initBackground() {
+  const canvas = document.getElementById('bg-canvas');
+  const W = window.innerWidth, H = window.innerHeight;
+
+  // Floating translucent bubbles
+  const bubbleColors = [
+    'rgba(108,99,255,', 'rgba(0,210,170,', 'rgba(245,158,11,', 'rgba(255,107,107,'
+  ];
+  for (let i = 0; i < 18; i++) {
+    const el = document.createElement('div');
+    el.className = 'bg-bubble';
+    const size = 40 + Math.random() * 120;
+    const color = bubbleColors[i % bubbleColors.length];
+    const opacity = 0.04 + Math.random() * 0.1;
+    el.style.cssText = `
+      width:${size}px;height:${size}px;
+      left:${Math.random()*100}%;top:${Math.random()*100}%;
+      background:radial-gradient(circle,${color}${opacity+0.06}) 0%,${color}0) 70%);
+      animation:floatBubble ${5+Math.random()*8}s ease-in-out ${Math.random()*4}s infinite;
+    `;
+    canvas.appendChild(el);
+  }
+
+  // Rotating rings
+  for (let i = 0; i < 6; i++) {
+    const el = document.createElement('div');
+    el.className = 'bg-ring';
+    const size = 80 + Math.random() * 200;
+    const color = bubbleColors[i % bubbleColors.length];
+    el.style.cssText = `
+      width:${size}px;height:${size}px;
+      left:${Math.random()*100}%;top:${Math.random()*100}%;
+      margin-left:-${size/2}px;margin-top:-${size/2}px;
+      border-color:${color}0.1);
+      animation:pulseRing ${4+Math.random()*4}s ease-in-out ${Math.random()*3}s infinite;
+    `;
+    canvas.appendChild(el);
+  }
+
+  // Star dots
+  for (let i = 0; i < 40; i++) {
+    const el = document.createElement('div');
+    el.className = 'bg-dot';
+    const size = 1 + Math.random() * 2.5;
+    el.style.cssText = `
+      width:${size}px;height:${size}px;
+      left:${Math.random()*100}%;top:${Math.random()*100}%;
+      background:rgba(255,255,255,0.6);
+      animation-delay:${Math.random()*4}s;
+      animation-duration:${2+Math.random()*3}s;
+    `;
+    canvas.appendChild(el);
+  }
+}
+
+// ─── Music Player ─────────────────────────────────────────────────────────────
+const audio = document.getElementById('bg-music');
+let musicPlaying = false;
+let musicVolume = 0.7;
+let musicFadingOut = false;
+let musicFadeInterval = null;
+
+let _appPath = '';
+
+async function initAssetPaths() {
+  try {
+    _appPath = await skyware.getAppPath();
+  } catch(e) { _appPath = ''; }
+}
+
+function resolveAsset(name) {
+  if (_appPath) return 'file:///' + _appPath + '/assets/' + name;
+  return '../../assets/' + name;
+}
+
+function fixIconSrcs() {
+  document.querySelectorAll('img[data-asset]').forEach(img => {
+    img.src = resolveAsset(img.dataset.asset);
+    img.onerror = () => {
+      if (!img.src.includes('icon.png')) img.src = resolveAsset('icon.png');
+    };
+  });
+}
+
+function musicSetSource() {
+  audio.src = resolveAsset('music.mp3');
+  audio.volume = musicVolume;
+}
+
+function musicPlay() {
+  audio.play().then(() => {
+    musicPlaying = true;
+    updateMusicUI();
+  }).catch(() => {
+    // Autoplay blocked or file missing — silently handle
+    musicPlaying = false;
+    updateMusicUI();
+  });
+}
+
+function musicToggle() {
+  if (musicPlaying) {
+    audio.pause();
+    musicPlaying = false;
+  } else {
+    audio.play().then(() => { musicPlaying = true; updateMusicUI(); }).catch(() => {});
+    musicPlaying = true;
+  }
+  updateMusicUI();
+}
+
+function musicNext() {
+  audio.currentTime = 0;
+  if (!musicPlaying) { audio.play().catch(()=>{}); musicPlaying = true; }
+  updateMusicUI();
+}
+
+function musicPrev() {
+  audio.currentTime = 0;
+  updateMusicUI();
+}
+
+function musicSetVol(e) {
+  const bar = document.getElementById('music-vol-bar');
+  const rect = bar.getBoundingClientRect();
+  const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  musicVolume = ratio;
+  audio.volume = ratio;
+  document.getElementById('music-vol-fill').style.width = (ratio * 100) + '%';
+  if (ratio > 0 && !musicPlaying) {
+    audio.play().then(() => { musicPlaying = true; updateMusicUI(); }).catch(() => {});
+  }
+}
+
+function updateMusicUI() {
+  const playIco = document.getElementById('music-play-ico');
+  const label = document.getElementById('music-label');
+  const eq = document.getElementById('music-eq');
+  if (musicPlaying) {
+    playIco.setAttribute('viewBox','0 0 24 24');
+    playIco.innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+    label.classList.add('playing');
+    eq.classList.remove('paused');
+  } else {
+    playIco.setAttribute('viewBox','0 0 24 24');
+    playIco.innerHTML = '<polygon points="5 3 19 12 5 21"/>';
+    label.classList.remove('playing');
+    eq.classList.add('paused');
+  }
+}
+
+function musicFadeOut(cb) {
+  if (musicFadingOut) return;
+  musicFadingOut = true;
+  const startVol = audio.volume;
+  const step = startVol / 25;
+  clearInterval(musicFadeInterval);
+  musicFadeInterval = setInterval(() => {
+    if (audio.volume > step) {
+      audio.volume = Math.max(0, audio.volume - step);
+    } else {
+      audio.volume = 0;
+      audio.pause();
+      musicPlaying = false;
+      musicFadingOut = false;
+      clearInterval(musicFadeInterval);
+      updateMusicUI();
+      if (cb) cb();
+    }
+  }, 40);
+}
+
+function musicFadeIn() {
+  clearInterval(musicFadeInterval);
+  musicFadingOut = false;
+  audio.volume = 0;
+  audio.play().then(() => {
+    musicPlaying = true;
+    updateMusicUI();
+    musicFadeInterval = setInterval(() => {
+      if (audio.volume < musicVolume - 0.03) {
+        audio.volume = Math.min(musicVolume, audio.volume + 0.03);
+      } else {
+        audio.volume = musicVolume;
+        clearInterval(musicFadeInterval);
+      }
+    }, 40);
+  }).catch(() => {});
+}
+
+// ─── Bootsplash sequence ──────────────────────────────────────────────────────
+async function runBootsplash() {
+  // Resolve asset paths first so icons/music work
+  await initAssetPaths();
+  fixIconSrcs();
+
+  const splash = document.getElementById('bootsplash');
+  const logoWrap = document.getElementById('splash-logo-wrap');
+  const logoImg = logoWrap.querySelector('img');
+  const appDiv = document.getElementById('app');
+  const titlebar = document.getElementById('titlebar');
+  const titleImg = titlebar.querySelector('img[data-asset]');
+
+  // Hide app until splash done
+  appDiv.style.opacity = '0';
+  titlebar.style.opacity = '0';
+
+  // Phase 1: show logo centered for 1.8s
+  await new Promise(r => setTimeout(r, 1800));
+
+  // Phase 2: animate logo from center to where titlebar logo will be
+  // Get target position (titlebar logo element)
+  titleImg.style.opacity = '0'; // hide titlebar copy during animation
+  const targetRect = titleImg.getBoundingClientRect();
+  const logoRect = logoWrap.getBoundingClientRect();
+
+  // Current center position
+  const startX = logoRect.left;
+  const startY = logoRect.top;
+  const startW = logoImg.offsetWidth;
+
+  // Target: top-left corner where titlebar logo sits
+  const endX = targetRect.left;
+  const endY = targetRect.top;
+  const endW = targetRect.width;
+  const scale = endW / startW;
+
+  // Switch logo from centered fixed to absolute positioned for animation
+  logoWrap.style.position = 'fixed';
+  logoWrap.style.top = startY + 'px';
+  logoWrap.style.left = startX + 'px';
+  logoWrap.style.transform = 'none';
+  logoWrap.style.transition = 'none';
+
+  // Force reflow
+  logoWrap.offsetHeight;
+
+  // Animate to corner
+  logoWrap.style.transition = 'top .7s cubic-bezier(0.4,0,0.2,1), left .7s cubic-bezier(0.4,0,0.2,1), transform .7s cubic-bezier(0.4,0,0.2,1), opacity .7s ease';
+  logoWrap.style.top = endY + 'px';
+  logoWrap.style.left = endX + 'px';
+  logoWrap.style.transform = `scale(${scale})`;
+  logoWrap.style.transformOrigin = 'top left';
+
+  // Fade out splash backdrop simultaneously
+  splash.classList.add('fade-out');
+
+  await new Promise(r => setTimeout(r, 600));
+
+  // Phase 3: start music + reveal app
+  musicSetSource();
+  musicPlay();
+
+  appDiv.style.transition = 'opacity .5s ease';
+  titlebar.style.transition = 'opacity .5s ease';
+  appDiv.style.opacity = '1';
+  titlebar.style.opacity = '1';
+
+  await new Promise(r => setTimeout(r, 300));
+
+  // Show real titlebar logo, hide animated one
+  titleImg.style.opacity = '1';
+  logoWrap.style.display = 'none';
+  splash.style.display = 'none';
+}
+
+
+// ─── Filtering ───────────────────────────────────────────────────────────────
+function getDisplayGames() {
+  let games = [...allGames];
+  if (currentView === 'recent') games = games.filter(g => g.lastPlayed > 0).sort((a,b) => b.lastPlayed - a.lastPlayed).slice(0,20);
+  else if (currentView === 'favorites') games = games.filter(g => g.fav);
+  if (activeFilter !== 'all') games = games.filter(g => g.source === activeFilter);
+  if (searchQuery) { const q = searchQuery; games = games.filter(g => g.name.toLowerCase().includes(q) || (g.genre||'').toLowerCase().includes(q)); }
+  if (activeFolderId) {
+    const folder = userFolders.find(f => f.id === activeFolderId);
+    if (folder) games = games.filter(g => (folder.gameIds || []).includes(g.id));
+  }
+  if (listSort === 'alpha') games.sort((a,b) => a.name.localeCompare(b.name));
+  else if (listSort === 'hours') games.sort((a,b) => b.hours - a.hours);
+  else games.sort((a,b) => b.lastPlayed - a.lastPlayed);
+  return games;
+}
+
+// ─── Render ──────────────────────────────────────────────────────────────────
+function renderAll() {
+  renderSidebar();
+  renderHero();
+  renderMain();
+  renderRight();
+  updateTopbar();
+}
+
+function renderSidebar() {
+  const games = getDisplayGames();
+  document.getElementById('left-count').textContent = `${games.length} game${games.length !== 1 ? 's' : ''}`;
+  const list = document.getElementById('game-list');
+  if (games.length === 0) {
+    list.innerHTML = `<div class="empty-state" style="padding:24px 8px"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>No games found</p></div>`;
+    return;
+  }
+  list.innerHTML = games.map((g, i) => `
+    <div class="g-item${selectedGame && g.id === selectedGame.id ? ' active' : ''}${!sidebarAnimated ? ' g-item-anim' : ''}" onclick="selectGame('${g.id}')" oncontextmenu="event.preventDefault(); event.stopPropagation(); openGameCtxMenu(event, '${g.id}')" ${!sidebarAnimated ? `style="animation-delay:${i * 0.03}s"` : ''}>
+      <div class="g-thumb">${coverHTML(g, '', 'width:100%;height:100%;object-fit:cover;display:block;border-radius:5px')}</div>
+      <div class="g-info">
+        <div class="g-name">${g.name}</div>
+        <div class="g-meta">
+          <div class="src-dot ${sourceConfig[g.source]?.dotClass || ''}"></div>
+          <span>${sourceConfig[g.source]?.label || g.source}</span>
+          ${g.hours > 0 ? `<span>·</span><span>${g.hours}h</span>` : ''}
+        </div>
+      </div>
+      ${g.fav ? '<div class="g-fav">♥</div>' : ''}
+      <div class="g-play" onclick="event.stopPropagation(); launchGame('${g.id}')"><svg width="9" height="9" viewBox="0 0 24 24" fill="#fff" stroke="none"><polygon points="5 3 19 12 5 21"/></svg></div>
+    </div>
+  `).join('');
+  // Mark animated so subsequent re-renders don't replay the slide-in
+  setTimeout(() => { sidebarAnimated = true; }, 500);
+}
+
+function renderHero() {
+  const heroGames = [...allGames].filter(g => g.lastPlayed > 0).sort((a,b) => b.lastPlayed - a.lastPlayed).slice(0,3);
+  if (heroGames.length === 0) { document.getElementById('hero').innerHTML = ''; return; }
+  document.getElementById('hero').innerHTML = heroGames.map(g => {
+    const imgSrc = getGameCover(g);
+    const bgStyle = imgSrc
+      ? `background-image:url('${imgSrc}')`
+      : `background:linear-gradient(135deg,#1a0a2e,#2d1b69,#f59e0b)`;
+    return `
+      <div class="hero-card" style="${bgStyle}" onclick="openDetail('${g.id}')">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+          <div class="hero-src-badge ${sourceConfig[g.source]?.badgeClass || ''}">${sourceConfig[g.source]?.label || g.source}</div>
+          <div class="hero-title">${g.name}</div>
+          <div class="hero-sub">${g.hours > 0 ? `${g.hours}h played` : 'Not played yet'}${g.genre ? ' · ' + g.genre : ''}</div>
+          <button class="hero-launch" onclick="event.stopPropagation(); launchGame('${g.id}')">
+            <svg style="width:9px;height:9px;display:inline;vertical-align:middle;margin-right:3px;fill:#fff;stroke:none" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21"/></svg>
+            Launch
+          </button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderMain() {
+  const games = getDisplayGames();
+  const content = document.getElementById('content');
+  if (games.length === 0) {
+    content.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg><h3>No games found</h3><p>Make sure Steam, Epic Games, or Minecraft are installed. Click Scan to search again.</p></div>`;
+    return;
+  }
+  const favGames = games.filter(g => g.fav);
+  let html = '';
+  if (favGames.length > 0 && currentView !== 'favorites') {
+    html += `<div class="sec-head"><div class="sec-title">Favorites <span class="sec-count">${favGames.length}</span></div></div>`;
+    html += viewMode === 'grid' ? renderGrid(favGames) : renderListView(favGames);
+  }
+  const sectionTitle = currentView === 'recent' ? 'Recently Played' : currentView === 'favorites' ? 'Favorites' : 'All Games';
+  html += `<div class="sec-head">
+    <div class="sec-title">${sectionTitle} <span class="sec-count">${games.length}</span></div>
+    <div class="sec-actions">
+      <button class="sec-btn" onclick="sortCards('hours')">Most Played</button>
+      <button class="sec-btn" onclick="sortCards('alpha')">A–Z</button>
+      <button class="sec-btn" onclick="sortCards('recent')">Recent</button>
+    </div>
+  </div>`;
+  html += viewMode === 'grid' ? renderGrid(games) : renderListView(games);
+  content.innerHTML = html;
+}
+
+function renderGrid(games) {
+  return `<div class="cards-grid">${games.map((g, i) => `
+    <div class="game-card" onclick="openDetail('${g.id}')" oncontextmenu="event.preventDefault(); event.stopPropagation(); openGameCtxMenu(event, '${g.id}')" style="animation-delay:${i * 0.04}s">
+      ${g.badge ? `<div class="card-badge badge-${g.badge}">${g.badge === 'new' ? 'New' : g.badge === 'play' ? 'Active' : 'Fav'}</div>` : ''}
+      <button class="card-fav-btn" onclick="event.stopPropagation(); toggleFav('${g.id}')" title="${g.fav ? 'Remove favorite' : 'Add favorite'}">${g.fav ? '♥' : '♡'}</button>
+      <div class="card-launch-overlay">
+        <button class="card-launch-btn" onclick="event.stopPropagation(); launchGame('${g.id}')">
+          <svg style="width:9px;height:9px;display:inline;vertical-align:middle;margin-right:3px;fill:#fff;stroke:none" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21"/></svg>
+          Play
+        </button>
+      </div>
+      ${coverHTML(g, 'card-cover', '')}
+      <div class="card-body">
+        <div class="card-title">${g.name}</div>
+        <div class="card-meta">
+          <div class="src-dot ${sourceConfig[g.source]?.dotClass || ''}"></div>
+          ${g.hours > 0 ? `<span class="card-hours">${g.hours}h</span>` : `<span>${sourceConfig[g.source]?.label || g.source}</span>`}
+        </div>
+      </div>
+    </div>
+  `).join('')}</div>`;
+}
+
+function renderListView(games) {
+  return `<div class="games-list-view">${games.map((g, i) => `
+    <div class="list-game-row" onclick="openDetail('${g.id}')" oncontextmenu="event.preventDefault(); event.stopPropagation(); openGameCtxMenu(event, '${g.id}')" style="animation-delay:${i * 0.03}s">
+      <div class="list-thumb">${coverHTML(g, '', 'width:100%;height:100%;object-fit:cover;display:block')}</div>
+      <div class="list-name">${g.name}</div>
+      <div class="list-source"><div class="src-dot ${sourceConfig[g.source]?.dotClass || ''}"></div>${sourceConfig[g.source]?.label || g.source}</div>
+      <div class="list-hours">${g.hours > 0 ? g.hours + 'h' : '—'}</div>
+      <div class="list-size">${g.size || '—'}</div>
+      <div class="list-actions">
+        <button class="list-act-btn list-act-launch" onclick="event.stopPropagation(); launchGame('${g.id}')">Launch</button>
+        ${g.installDir ? `<button class="list-act-btn list-act-folder" onclick="event.stopPropagation(); openFolder('${g.id}')"><svg style="width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:1.5;vertical-align:middle" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></button>` : ''}
+      </div>
+    </div>
+  `).join('')}</div>`;
+}
+
+function renderRight() {
+  const totalHours = allGames.reduce((s, g) => s + (g.hours || 0), 0);
+  const favCount = allGames.filter(g => g.fav).length;
+  const sources = [...new Set(allGames.map(g => g.source))];
+  document.getElementById('stat-total').textContent = allGames.length;
+  document.getElementById('stat-hours').textContent = totalHours > 0 ? totalHours + 'h' : '0h';
+  document.getElementById('stat-favs').textContent = favCount;
+  document.getElementById('stat-sources').textContent = sources.length;
+
+  // Sources with proper SVG icons
+  const srcCounts = {};
+  allGames.forEach(g => { srcCounts[g.source] = (srcCounts[g.source] || 0) + 1; });
+  document.getElementById('sources-list').innerHTML = Object.entries(srcCounts).map(([src, cnt]) => `
+    <div class="source-row">
+      ${getSrcIcoHTML(src)}
+      <div class="src-name">${sourceConfig[src]?.label || src}</div>
+      <div class="src-count">${cnt}</div>
+    </div>
+  `).join('');
+
+  // Playtime bars
+  const topGames = [...allGames].filter(g => g.hours > 0).sort((a,b) => b.hours - a.hours).slice(0, 5);
+  const maxH = topGames.length > 0 ? topGames[0].hours : 1;
+  document.getElementById('playtime-list').innerHTML = topGames.length === 0
+    ? '<div style="font-size:11px;color:var(--text3);padding:4px 0">No playtime data yet</div>'
+    : topGames.map(g => `
+    <div class="prog-wrap">
+      <div class="prog-label">
+        <span class="prog-label-name">${g.name}</span>
+        <span class="prog-label-val">${g.hours}h</span>
+      </div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${Math.round(g.hours/maxH*100)}%"></div></div>
+    </div>`).join('');
+
+  // Recent activity
+  const recent = [...allGames].filter(g => g.lastPlayed > 0).sort((a,b) => b.lastPlayed - a.lastPlayed).slice(0, 5);
+  document.getElementById('activity-list').innerHTML = recent.length === 0
+    ? '<div style="font-size:11px;color:var(--text3);padding:4px 0">No recent activity</div>'
+    : recent.map(g => {
+      const ago = timeAgo(new Date(g.lastPlayed * 1000));
+      const imgSrc = getGameCover(g);
+      return `<div class="act-item">
+        <div class="act-thumb">${imgSrc ? `<img src="${imgSrc}" onerror="this.style.display='none'">` : `<div class="hytale-cover" style="font-size:8px">${g.name.substring(0,2)}</div>`}</div>
+        <div><div class="act-text"><strong>${g.name}</strong></div><div class="act-time">${ago}</div></div>
+      </div>`;
+    }).join('');
+}
+
+function updateTopbar() {
+  if (!selectedGame) return;
+  const imgSrc = getGameCover(selectedGame);
+  document.getElementById('np-thumb').innerHTML = imgSrc
+    ? `<img src="${imgSrc}" style="width:100%;height:100%;object-fit:cover;display:block">`
+    : `<div class="hytale-cover" style="font-size:9px">${selectedGame.name.substring(0,2).toUpperCase()}</div>`;
+  document.getElementById('np-name').textContent = selectedGame.name;
+}
+
+// ─── Actions ─────────────────────────────────────────────────────────────────
+function selectGame(id) {
+  selectedGame = allGames.find(g => g.id === id);
+  renderSidebar();
+  updateTopbar();
+}
+
+function openDetail(id) {
+  const g = allGames.find(x => x.id === id);
+  if (!g) return;
+  selectGame(id);
+  const src = sourceConfig[g.source] || {};
+  const lastPlayedStr = g.lastPlayed > 0 ? timeAgo(new Date(g.lastPlayed * 1000)) : 'Never';
+  const coverSrc = getGameCover(g);
+  const isMinecraftJava = g.id === 'minecraft_java';
+
+  const tabs = isMinecraftJava ? `
+    <div class="det-tabs">
+      <button class="det-tab active" onclick="detSwitchTab('overview', this)">Overview</button>
+      <button class="det-tab" onclick="detSwitchTab('launchers', this)">Launchers</button>
+    </div>` : '';
+
+  const overviewContent = `
+    <div class="det-stats-grid">
+      <div class="det-stat"><div class="det-stat-num">${g.hours || 0}h</div><div class="det-stat-label">Played</div></div>
+      <div class="det-stat"><div class="det-stat-num">${g.achievements || '—'}</div><div class="det-stat-label">Achievements</div></div>
+      <div class="det-stat"><div class="det-stat-num">${g.size || '—'}</div><div class="det-stat-label">Size</div></div>
+      <div class="det-stat"><div class="det-stat-num" style="font-size:14px">${lastPlayedStr}</div><div class="det-stat-label">Last Played</div></div>
+    </div>
+    ${g.installDir ? `<div class="det-divider"></div><div class="det-path"><span class="det-path-label">Path:</span><span class="det-path-val">${g.installDir}</span></div>` : ''}`;
+
+  const launchersContent = isMinecraftJava ? `
+    <div class="launcher-scanning" id="launcher-scan-msg">
+      <div class="launcher-scan-spinner"></div> Scanning for launchers...
+    </div>
+    <div class="launcher-grid" id="launcher-grid" style="display:none"></div>` : '';
+
+  document.getElementById('det-content').innerHTML = `
+    ${coverSrc ? `<img class="det-banner" src="${coverSrc}" alt="${g.name}" onerror="this.style.display='none'">` : `<div class="det-banner hytale-cover" style="height:180px"><div class="hytale-cover-text" style="font-size:24px">${g.name}</div></div>`}
+    <div class="det-body">
+      <div class="det-back" onclick="closeDetail()">
+        <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back to Library
+      </div>
+      <div class="det-hero-row">
+        <div class="det-cover">${coverSrc ? `<img src="${coverSrc}" alt="${g.name}">` : `<div class="hytale-cover"><div class="hytale-cover-text">${g.name.substring(0,2).toUpperCase()}</div></div>`}</div>
+        <div class="det-info">
+          <div class="det-name">${g.name}</div>
+          <div class="det-source-line">
+            <div class="det-src-badge ${src.badgeClass || ''}">${src.label || g.source}</div>
+            ${g.genre ? `<div class="det-tag">${g.genre}</div>` : ''}
+          </div>
+          ${g.tags && g.tags.length > 0 ? `<div class="det-tags">${g.tags.map(t => `<div class="det-tag">${t}</div>`).join('')}</div>` : ''}
+          <div class="det-desc">${g.desc || '<span style="color:var(--text3)">No description available.</span>'}</div>
+          <div class="det-actions">
+            ${isMinecraftJava
+              ? `<button class="det-btn det-btn-primary" onclick="detSwitchTab('launchers', document.querySelectorAll('.det-tab')[1])">
+                  <svg style="width:10px;height:10px;display:inline;vertical-align:middle;margin-right:4px;fill:#fff;stroke:none" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21"/></svg>
+                  Choose Launcher
+                </button>`
+              : `<button class="det-btn det-btn-primary" onclick="launchGame('${g.id}')">
+                  <svg style="width:10px;height:10px;display:inline;vertical-align:middle;margin-right:4px;fill:#fff;stroke:none" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21"/></svg>
+                  Launch
+                </button>`
+            }
+            <button class="det-btn det-btn-fav${g.fav ? ' active' : ''}" id="det-fav-btn" onclick="toggleFavDetail('${g.id}')">${g.fav ? '♥ Favorited' : '♡ Favorite'}</button>
+            <button class="det-btn det-btn-ghost" onclick="openAddToFolder('${g.id}')">
+              <svg style="width:11px;height:11px;display:inline;vertical-align:middle;margin-right:4px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+              Folders
+            </button>
+            ${g.installDir ? `<button class="det-btn det-btn-ghost" onclick="openFolder('${g.id}')">
+              <svg style="width:11px;height:11px;display:inline;vertical-align:middle;margin-right:4px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+              Open Folder
+            </button>` : ''}
+            <button class="det-btn det-btn-ghost" onclick="closeDetail()">Close</button>
+          </div>
+        </div>
+      </div>
+      ${tabs}
+      <div class="det-tab-content active" id="tab-overview">${overviewContent}</div>
+      ${isMinecraftJava ? `<div class="det-tab-content" id="tab-launchers">${launchersContent}</div>` : ''}
+    </div>`;
+
+  document.getElementById('detail').classList.add('show');
+
+  // Kick off launcher scan in background if minecraft java
+  if (isMinecraftJava) {
+    scanAndRenderLaunchers();
+  }
+}
+
+function detSwitchTab(tabId, el) {
+  document.querySelectorAll('.det-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.det-tab-content').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-' + tabId).classList.add('active');
+}
+
+async function scanAndRenderLaunchers() {
+  try {
+    const launchers = await skyware.scanMinecraftLaunchers();
+    // Store globally so onclick can reference by index safely
+    window._mcLaunchers = launchers;
+
+    const grid = document.getElementById('launcher-grid');
+    const msg = document.getElementById('launcher-scan-msg');
+    if (!grid) return;
+
+    const available = launchers.filter(l => l.available);
+    const unavailable = launchers.filter(l => !l.available);
+    const sorted = [...available, ...unavailable];
+
+    grid.innerHTML = sorted.map((l, i) => {
+      const realIdx = launchers.indexOf(l);
+      return `
+      <div class="launcher-card${l.available ? '' : ' unavailable'}"
+           ${l.available ? `onclick="launchMinecraftWith(${realIdx})"` : ''}>
+        <span class="launcher-icon">${l.icon}</span>
+        <div class="launcher-name">${l.name}</div>
+        <div class="launcher-status ${l.available ? 'found' : 'notfound'}">${l.available ? '✓ Installed' : 'Not found'}</div>
+      </div>`;
+    }).join('');
+
+    msg.style.display = 'none';
+    grid.style.display = 'grid';
+  } catch (e) {
+    const msg = document.getElementById('launcher-scan-msg');
+    if (msg) msg.innerHTML = '<span style="color:var(--accent2)">Scan failed: ' + e.message + '</span>';
+  }
+}
+
+async function launchMinecraftWith(idx) {
+  const launcher = window._mcLaunchers && window._mcLaunchers[idx];
+  if (!launcher) return;
+  toast(`Launching via <strong>${launcher.name}</strong>...`, 'info');
+
+  const onExit = () => {
+    musicFadeIn();
+    skyware.rpcSetLauncher().catch(() => {});
+    toast(`<strong>${launcher.name}</strong> closed`, 'info');
+  };
+
+  const doLaunch = async () => {
+    const result = await skyware.launchMinecraftLauncher(launcher);
+    if (result.success) {
+      skyware.rpcSetPlaying('Minecraft Java Edition').catch(() => {});
+      toast(`<strong>${launcher.name}</strong> launched!`, 'success');
+      skyware.onGameExited(onExit);
+    } else {
+      toast(`Could not launch: ${result.error}`, 'error');
+      musicFadeIn();
+    }
+  };
+
+  if (musicPlaying) musicFadeOut(doLaunch);
+  else doLaunch();
+}
+
+function closeDetail() { document.getElementById('detail').classList.remove('show'); }
+
+async function launchGame(id) {
+  const g = allGames.find(x => x.id === id);
+  if (!g) return;
+  toast(`Launching <strong>${g.name}</strong>...`, 'info');
+
+  const onExit = () => {
+    musicFadeIn();
+    skyware.rpcSetLauncher().catch(() => {});
+    toast(`<strong>${g.name}</strong> closed`, 'info');
+  };
+
+  const doLaunch = async () => {
+    try {
+      const result = g.source === 'custom'
+        ? await skyware.launchCustomGame(g)
+        : await skyware.launchGame(g);
+      if (result.success) {
+        skyware.rpcSetPlaying(g.name).catch(() => {});
+        toast(`<strong>${g.name}</strong> launched!`, 'success');
+        skyware.onGameExited(onExit);
+      } else {
+        toast(`Could not launch: ${result.error || 'Unknown error'}`, 'error');
+        musicFadeIn();
+      }
+    } catch (e) {
+      toast(`Launch error: ${e.message}`, 'error');
+      musicFadeIn();
+    }
+  };
+
+  if (musicPlaying) musicFadeOut(doLaunch);
+  else doLaunch();
+}
+
+function launchSelected() {
+  if (selectedGame) launchGame(selectedGame.id);
+  else toast('Select a game first', 'info');
+}
+
+async function toggleFav(id) {
+  const g = allGames.find(x => x.id === id);
+  if (!g) return;
+  g.fav = !g.fav;
+  if (!userData.favorites) userData.favorites = [];
+  if (g.fav) userData.favorites.push(id);
+  else userData.favorites = userData.favorites.filter(f => f !== id);
+  await skyware.toggleFavorite(id, !g.fav);
+  toast(g.fav ? `Added <strong>${g.name}</strong> to favorites` : `Removed from favorites`, g.fav ? 'success' : 'info');
+  renderAll();
+}
+
+async function toggleFavDetail(id) {
+  await toggleFav(id);
+  const g = allGames.find(x => x.id === id);
+  const btn = document.getElementById('det-fav-btn');
+  if (btn && g) { btn.textContent = g.fav ? '♥ Favorited' : '♡ Favorite'; btn.className = `det-btn det-btn-fav${g.fav ? ' active' : ''}`; }
+}
+
+async function openFolder(id) {
+  const g = allGames.find(x => x.id === id);
+  if (!g || !g.installDir) { toast('No install folder found', 'error'); return; }
+  const ok = await skyware.openFolder(g.installDir);
+  if (!ok) toast('Folder not found', 'error');
+}
+
+function surpriseMe() {
+  if (allGames.length === 0) return;
+  openDetail(allGames[Math.floor(Math.random() * allGames.length)].id);
+}
+
+// ─── UI Controls ─────────────────────────────────────────────────────────────
+function onSearch(q) { searchQuery = q.toLowerCase(); renderSidebar(); renderMain(); }
+function setFilter(f, el) {
+  activeFilter = f;
+  document.querySelectorAll('.ftag').forEach(e => e.classList.remove('on'));
+  el.classList.add('on');
+  renderSidebar(); renderMain();
+}
+function setListSort(s, el) {
+  listSort = s;
+  document.querySelectorAll('.lsort').forEach(e => e.classList.remove('on'));
+  el.classList.add('on');
+  renderSidebar();
+}
+function sortCards(mode) {
+  if (mode === 'alpha') allGames.sort((a,b) => a.name.localeCompare(b.name));
+  else if (mode === 'hours') allGames.sort((a,b) => b.hours - a.hours);
+  else allGames.sort((a,b) => b.lastPlayed - a.lastPlayed);
+  renderMain();
+}
+function setViewMode(mode) {
+  viewMode = mode;
+  document.getElementById('view-grid-btn').classList.toggle('active', mode === 'grid');
+  document.getElementById('view-list-btn').classList.toggle('active', mode === 'list');
+  renderMain();
+}
+function switchView(view, el) {
+  currentView = view;
+  document.querySelectorAll('.sicon').forEach(e => e.classList.remove('active'));
+  el.classList.add('active');
+  if (view === 'stats') {
+    document.getElementById('hero').innerHTML = '';
+    document.getElementById('content').innerHTML = renderStatsView();
+  } else { renderMain(); renderHero(); }
+  renderSidebar();
+}
+
+function renderStatsView() {
+  const totalH = allGames.reduce((s,g) => s+(g.hours||0), 0);
+  const top10 = [...allGames].filter(g=>g.hours>0).sort((a,b)=>b.hours-a.hours).slice(0,10);
+  const maxH = top10.length > 0 ? top10[0].hours : 1;
+  return `
+    <div class="sec-head" style="animation-delay:0s"><div class="sec-title">Your Stats</div></div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px">
+      <div class="det-stat"><div class="det-stat-num">${allGames.length}</div><div class="det-stat-label">Total Games</div></div>
+      <div class="det-stat"><div class="det-stat-num">${totalH}h</div><div class="det-stat-label">Hours Played</div></div>
+      <div class="det-stat"><div class="det-stat-num">${allGames.filter(g=>g.fav).length}</div><div class="det-stat-label">Favorites</div></div>
+      <div class="det-stat"><div class="det-stat-num">${[...new Set(allGames.map(g=>g.source))].length}</div><div class="det-stat-label">Platforms</div></div>
+    </div>
+    <div class="sec-head"><div class="sec-title">Top 10 Most Played</div></div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      ${top10.map((g,i) => {
+        const imgSrc = getGameCover(g);
+        return `<div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--bg3);border-radius:8px;border:1px solid var(--border);cursor:pointer;transition:all .2s;animation:fadeInUp .4s var(--ease-out) ${i*0.04}s both" onmouseover="this.style.borderColor='var(--border2)';this.style.transform='translateX(4px)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform=''" onclick="openDetail('${g.id}')">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:var(--text3);width:20px;text-align:center">${i+1}</div>
+          <div style="width:54px;height:30px;border-radius:5px;overflow:hidden;background:var(--bg4);flex-shrink:0">${imgSrc ? `<img src="${imgSrc}" style="width:100%;height:100%;object-fit:cover">` : `<div class="hytale-cover">${g.name.substring(0,2)}</div>`}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${g.name}</div>
+            <div style="height:4px;background:var(--bg5);border-radius:2px;margin-top:5px;overflow:hidden"><div style="height:100%;background:linear-gradient(90deg,var(--accent),var(--accent3));width:${Math.round(g.hours/maxH*100)}%;border-radius:2px"></div></div>
+          </div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--accent3);flex-shrink:0">${g.hours}h</div>
+        </div>`;
+      }).join('')}
+      ${top10.length === 0 ? '<div style="color:var(--text3);font-size:13px;padding:20px;text-align:center;animation:fadeIn .4s ease">No playtime data. Go play some games!</div>' : ''}
+    </div>`;
+}
+
+// ─── Toasts ───────────────────────────────────────────────────────────────────
+function toast(msg, type = 'info') {
+  const container = document.getElementById('toast-container');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<div class="toast-dot"></div><div class="toast-text">${msg}</div>`;
+  container.appendChild(el);
+  setTimeout(() => {
+    el.classList.add('removing');
+    setTimeout(() => el.remove(), 300);
+  }, 3000);
+}
+
+// ─── Utils ────────────────────────────────────────────────────────────────────
+function timeAgo(date) {
+  const s = Math.floor((Date.now() - date.getTime()) / 1000);
+  if (s < 60) return 'Just now';
+  if (s < 3600) return `${Math.floor(s/60)}m ago`;
+  if (s < 86400) return `${Math.floor(s/3600)}h ago`;
+  if (s < 604800) return `${Math.floor(s/86400)}d ago`;
+  if (s < 2592000) return `${Math.floor(s/604800)}w ago`;
+  return date.toLocaleDateString();
+}
+
+document.getElementById('detail').addEventListener('click', function(e) {
+  if (e.target === this) closeDetail();
+});
+
+// ─── CUSTOM GAMES & FOLDERS ───────────────────────────────────────────────────
+
+const GAME_EMOJIS = ['🎮','🕹️','⚔️','🔫','🧙','🚀','🏎️','⚽','🧩','🏹','🛡️','💣','🔥','🌟','👾','🤖','🐉','🏆','🎯','💥','🌍','🚁','🦅','🗡️','🪄'];
+const FOLDER_EMOJIS = ['📁','🎮','⭐','🔥','💎','🏆','🎯','🚀','💡','🎲','🌙','🎪','🧪','🗂️','📌','🎭','🌈','🏅','🔮','🎸'];
+
+let customGames = [];   // [{id, name, exePath, coverPath, icon, source:'custom'}]
+let userFolders = [];   // [{id, name, icon, gameIds:[]}]
+let activeFolderId = null; // null = no folder filter
+let _editingFolderId = null;
+let _addToFolderId_game = null;
+let _selectedGameEmoji = GAME_EMOJIS[0];
+let _selectedFolderEmoji = FOLDER_EMOJIS[0];
+
+function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+// ── Persist ──────────────────────────────────────────────────────────────────
+async function saveFoldersAndCustom() {
+  const ud = await skyware.loadUserData();
+  ud.customGames = customGames;
+  ud.userFolders = userFolders;
+  await skyware.saveUserData(ud);
+}
+
+async function loadFoldersAndCustom() {
+  const ud = await skyware.loadUserData();
+  customGames = ud.customGames || [];
+  userFolders = ud.userFolders || [];
+  // Merge custom games into allGames
+  mergeCustomGames();
+}
+
+function mergeCustomGames() {
+  // Remove old custom entries, re-add fresh
+  allGames = allGames.filter(g => g.source !== 'custom');
+  for (const cg of customGames) {
+    allGames.push({
+      id: cg.id,
+      name: cg.name,
+      source: 'custom',
+      exePath: cg.exePath,
+      coverPath: cg.coverPath || null,
+      icon: cg.icon || '🎮',
+      installDir: cg.exePath ? cg.exePath.replace(/[^/\\]+$/, '') : null,
+      hours: 0, lastPlayed: 0, fav: false,
+      genre: 'Custom', desc: '', badge: null, tags: [], rating: 0, achievements: 0, size: 0,
+    });
+  }
+  // Merge favorites & hours from userData if present
+}
+
+// ── Folders sidebar ──────────────────────────────────────────────────────────
+function renderFoldersSidebar() {
+  const list = document.getElementById('folders-list');
+  if (!list) return;
+  if (userFolders.length === 0) {
+    list.innerHTML = `<div style="font-size:11px;color:var(--text3);padding:2px 8px 6px;line-height:1.5">No folders yet.<br>Click <strong>+</strong> to create one.</div>`;
+    return;
+  }
+  list.innerHTML = userFolders.map(f => {
+    const count = f.gameIds ? f.gameIds.length : 0;
+    const isActive = activeFolderId === f.id;
+    return `<div class="folder-item${isActive ? ' active' : ''}" onclick="selectFolder('${f.id}')">
+      <span class="folder-item-icon">${f.icon}</span>
+      <span class="folder-item-name">${f.name}</span>
+      <span class="folder-item-count">${count}</span>
+      <button class="folder-item-menu" onclick="event.stopPropagation(); openFolderCtxMenu(event, '${f.id}')" title="Options">⋯</button>
+    </div>`;
+  }).join('');
+}
+
+function selectFolder(id) {
+  activeFolderId = activeFolderId === id ? null : id;
+  renderFoldersSidebar();
+  renderSidebar();
+  renderMain();
+}
+
+// ── Add Game Modal ───────────────────────────────────────────────────────────
+function openAddGame() {
+  document.getElementById('add-game-exe').value = '';
+  document.getElementById('add-game-name').value = '';
+  document.getElementById('add-game-cover').value = '';
+  _selectedGameEmoji = GAME_EMOJIS[0];
+  renderEmojiGrid('add-game-emoji-grid', GAME_EMOJIS, () => _selectedGameEmoji, v => { _selectedGameEmoji = v; });
+  document.getElementById('modal-add-game').classList.add('show');
+}
+
+async function browseExe() {
+  const p = await skyware.browseForExe();
+  if (!p) return;
+  document.getElementById('add-game-exe').value = p;
+  // Auto-fill name from filename if empty
+  const nameField = document.getElementById('add-game-name');
+  if (!nameField.value) {
+    const basename = p.split(/[/\\]/).pop().replace(/\.(exe|app)$/i, '').replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    nameField.value = basename;
+  }
+}
+
+async function browseCover() {
+  const p = await skyware.browseForImage();
+  if (!p) return;
+  document.getElementById('add-game-cover').value = p;
+}
+
+async function submitAddGame() {
+  const exe = document.getElementById('add-game-exe').value.trim();
+  const name = document.getElementById('add-game-name').value.trim();
+  if (!exe) { toast('Please select an executable', 'error'); return; }
+  if (!name) { toast('Please enter a game name', 'error'); return; }
+  const cover = document.getElementById('add-game-cover').value.trim();
+  const cg = { id: 'custom_' + genId(), name, exePath: exe, coverPath: cover || null, icon: _selectedGameEmoji };
+  customGames.push(cg);
+  await saveFoldersAndCustom();
+  mergeCustomGames();
+  closeModal('modal-add-game');
+  toast(`<strong>${name}</strong> added to library`, 'success');
+  sidebarAnimated = false;
+  renderAll();
+}
+
+// ── Create/Edit Folder Modal ─────────────────────────────────────────────────
+function openCreateFolder() {
+  _editingFolderId = null;
+  document.getElementById('folder-modal-title').textContent = 'New Folder';
+  document.getElementById('folder-modal-save-btn').textContent = 'Create';
+  document.getElementById('folder-name-input').value = '';
+  _selectedFolderEmoji = FOLDER_EMOJIS[0];
+  renderEmojiGrid('folder-emoji-grid', FOLDER_EMOJIS, () => _selectedFolderEmoji, v => { _selectedFolderEmoji = v; });
+  document.getElementById('modal-create-folder').classList.add('show');
+  setTimeout(() => document.getElementById('folder-name-input').focus(), 100);
+}
+
+function openEditFolder(id) {
+  const f = userFolders.find(x => x.id === id);
+  if (!f) return;
+  _editingFolderId = id;
+  document.getElementById('folder-modal-title').textContent = 'Edit Folder';
+  document.getElementById('folder-modal-save-btn').textContent = 'Save';
+  document.getElementById('folder-name-input').value = f.name;
+  _selectedFolderEmoji = f.icon;
+  renderEmojiGrid('folder-emoji-grid', FOLDER_EMOJIS, () => _selectedFolderEmoji, v => { _selectedFolderEmoji = v; });
+  document.getElementById('modal-create-folder').classList.add('show');
+  setTimeout(() => document.getElementById('folder-name-input').focus(), 100);
+}
+
+async function submitFolder() {
+  const name = document.getElementById('folder-name-input').value.trim();
+  if (!name) { toast('Please enter a folder name', 'error'); return; }
+  if (_editingFolderId) {
+    const f = userFolders.find(x => x.id === _editingFolderId);
+    if (f) { f.name = name; f.icon = _selectedFolderEmoji; }
+    toast(`Folder renamed to <strong>${name}</strong>`, 'success');
+  } else {
+    userFolders.push({ id: 'folder_' + genId(), name, icon: _selectedFolderEmoji, gameIds: [] });
+    toast(`Folder <strong>${name}</strong> created`, 'success');
+  }
+  await saveFoldersAndCustom();
+  closeModal('modal-create-folder');
+  renderFoldersSidebar();
+}
+
+async function deleteFolder(id) {
+  const f = userFolders.find(x => x.id === id);
+  if (!f) return;
+  userFolders = userFolders.filter(x => x.id !== id);
+  if (activeFolderId === id) activeFolderId = null;
+  await saveFoldersAndCustom();
+  toast(`Folder deleted`, 'info');
+  renderFoldersSidebar();
+  renderSidebar();
+  renderMain();
+}
+
+// ── Add to Folder Modal ──────────────────────────────────────────────────────
+function openAddToFolder(gameId) {
+  _addToFolderId_game = gameId;
+  const g = allGames.find(x => x.id === gameId);
+  document.getElementById('add-to-folder-sub').textContent = g ? `Folders for "${g.name}"` : 'Choose folders for this game.';
+  renderAddToFolderList(gameId);
+  document.getElementById('modal-add-to-folder').classList.add('show');
+}
+
+function renderAddToFolderList(gameId) {
+  const list = document.getElementById('add-to-folder-list');
+  if (userFolders.length === 0) {
+    list.innerHTML = `<div style="font-size:13px;color:var(--text2);padding:12px;text-align:center">No folders yet. <span style="color:var(--accent);cursor:pointer" onclick="closeModal('modal-add-to-folder'); openCreateFolder()">Create one first</span>.</div>`;
+    return;
+  }
+  list.innerHTML = userFolders.map(f => {
+    const inFolder = (f.gameIds || []).includes(gameId);
+    return `<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;border:1px solid ${inFolder ? 'var(--border2)' : 'var(--border)'};background:${inFolder ? 'rgba(108,99,255,.08)' : 'var(--bg3)'};cursor:pointer;transition:all .15s" onclick="toggleGameInFolder('${f.id}', '${gameId}')">
+      <span style="font-size:18px">${f.icon}</span>
+      <span style="flex:1;font-size:13px;font-weight:500">${f.name}</span>
+      <span style="font-size:12px;color:${inFolder ? 'var(--accent3)' : 'var(--text3)'}">${inFolder ? '✓ Added' : '+ Add'}</span>
+    </div>`;
+  }).join('');
+}
+
+async function toggleGameInFolder(folderId, gameId) {
+  const f = userFolders.find(x => x.id === folderId);
+  if (!f) return;
+  if (!f.gameIds) f.gameIds = [];
+  if (f.gameIds.includes(gameId)) {
+    f.gameIds = f.gameIds.filter(id => id !== gameId);
+    toast(`Removed from <strong>${f.name}</strong>`, 'info');
+  } else {
+    f.gameIds.push(gameId);
+    toast(`Added to <strong>${f.name}</strong>`, 'success');
+  }
+  await saveFoldersAndCustom();
+  renderAddToFolderList(gameId);
+  renderFoldersSidebar();
+}
+
+// ── Context Menu ─────────────────────────────────────────────────────────────
+function openGameCtxMenu(e, gameId) {
+  const g = allGames.find(x => x.id === gameId);
+  if (!g) return;
+  const menu = document.getElementById('ctx-menu');
+  const inFolderLines = userFolders.length > 0
+    ? userFolders.map(f => {
+        const inFolder = (f.gameIds || []).includes(gameId);
+        return `<div class="ctx-item" onclick="closeCtxMenu(); ctxToggleFolder('${f.id}', '${gameId}')">
+          <span style="width:16px;text-align:center">${f.icon}</span>
+          <span style="flex:1">${f.name}</span>
+          ${inFolder ? '<span style="color:var(--accent3);font-size:10px">✓</span>' : ''}
+        </div>`;
+      }).join('')
+    : `<div class="ctx-item" style="opacity:.5;cursor:default;pointer-events:none"><span>No folders yet</span></div>`;
+
+  menu.innerHTML = `
+    <div class="ctx-item" onclick="closeCtxMenu(); launchGame('${gameId}')">
+      <svg style="width:12px;height:12px;fill:currentColor;stroke:none" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21"/></svg>
+      Launch
+    </div>
+    <div class="ctx-item" onclick="closeCtxMenu(); openDetail('${gameId}')">
+      <svg style="width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      View Details
+    </div>
+    <div style="height:1px;background:var(--border);margin:3px 4px"></div>
+    <div style="padding:4px 12px 2px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px">Add to Folder</div>
+    ${inFolderLines}
+    <div class="ctx-item" onclick="closeCtxMenu(); openCreateFolder()">
+      <span style="width:16px;text-align:center">+</span>
+      New Folder…
+    </div>
+    <div style="height:1px;background:var(--border);margin:3px 4px"></div>
+    <div class="ctx-item" onclick="closeCtxMenu(); toggleFav('${gameId}')">
+      <span style="width:16px;text-align:center">${g.fav ? '♥' : '♡'}</span>
+      ${g.fav ? 'Remove Favorite' : 'Add to Favorites'}
+    </div>
+    ${g.source === 'custom' ? `<div class="ctx-item danger" onclick="closeCtxMenu(); removeCustomGame('${gameId}')">
+      <svg style="width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+      Remove Game
+    </div>` : ''}
+  `;
+  menu.style.left = Math.min(e.clientX, window.innerWidth - 200) + 'px';
+  menu.style.top = Math.min(e.clientY, window.innerHeight - menu.offsetHeight - 10) + 'px';
+  menu.classList.add('show');
+  // Reposition after render so height is known
+  requestAnimationFrame(() => {
+    menu.style.top = Math.min(e.clientY, window.innerHeight - menu.offsetHeight - 10) + 'px';
+  });
+}
+
+async function ctxToggleFolder(folderId, gameId) {
+  const f = userFolders.find(x => x.id === folderId);
+  if (!f) return;
+  if (!f.gameIds) f.gameIds = [];
+  if (f.gameIds.includes(gameId)) {
+    f.gameIds = f.gameIds.filter(id => id !== gameId);
+    toast(`Removed from <strong>${f.name}</strong>`, 'info');
+  } else {
+    f.gameIds.push(gameId);
+    toast(`Added to <strong>${f.name}</strong>`, 'success');
+  }
+  await saveFoldersAndCustom();
+  renderFoldersSidebar();
+}
+
+async function removeCustomGame(gameId) {
+  const g = allGames.find(x => x.id === gameId);
+  if (!g) return;
+  customGames = customGames.filter(c => c.id !== gameId);
+  userFolders.forEach(f => { f.gameIds = (f.gameIds || []).filter(id => id !== gameId); });
+  await saveFoldersAndCustom();
+  mergeCustomGames();
+  toast(`<strong>${g.name}</strong> removed`, 'info');
+  if (selectedGame && selectedGame.id === gameId) selectedGame = allGames[0] || null;
+  sidebarAnimated = false;
+  renderAll();
+  renderFoldersSidebar();
+}
+
+function openFolderCtxMenu(e, folderId) {
+  e.stopPropagation();
+  const menu = document.getElementById('ctx-menu');
+  menu.innerHTML = `
+    <div class="ctx-item" onclick="closeCtxMenu(); openEditFolder('${folderId}')">✏️ &nbsp;Rename</div>
+    <div class="ctx-item danger" onclick="closeCtxMenu(); deleteFolder('${folderId}')">🗑️ &nbsp;Delete</div>
+  `;
+  menu.style.left = Math.min(e.clientX, window.innerWidth - 160) + 'px';
+  menu.style.top = Math.min(e.clientY, window.innerHeight - 90) + 'px';
+  menu.classList.add('show');
+}
+
+function closeCtxMenu() { document.getElementById('ctx-menu').classList.remove('show'); }
+document.addEventListener('click', closeCtxMenu);
+document.addEventListener('contextmenu', closeCtxMenu);
+
+// ── Modal helpers ────────────────────────────────────────────────────────────
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+// Close modals on overlay click
+['modal-add-game','modal-create-folder','modal-add-to-folder'].forEach(id => {
+  document.getElementById(id).addEventListener('click', function(e) {
+    if (e.target === this) closeModal(id);
+  });
+});
+
+// Enter key submits folder/game modals
+document.getElementById('folder-name-input').addEventListener('keydown', e => { if (e.key === 'Enter') submitFolder(); });
+document.getElementById('add-game-name').addEventListener('keydown', e => { if (e.key === 'Enter') submitAddGame(); });
+
+// ── Emoji grid helper ────────────────────────────────────────────────────────
+function renderEmojiGrid(containerId, emojis, getVal, setVal) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = emojis.map(em =>
+    `<div class="modal-emoji-opt${getVal() === em ? ' selected' : ''}" onclick="selectEmoji('${containerId}', '${em}', this)">${em}</div>`
+  ).join('');
+}
+
+function selectEmoji(containerId, emoji, el) {
+  if (containerId === 'add-game-emoji-grid') _selectedGameEmoji = emoji;
+  else if (containerId === 'folder-emoji-grid') _selectedFolderEmoji = emoji;
+  document.querySelectorAll(`#${containerId} .modal-emoji-opt`).forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+// ── Filter tag for custom games ───────────────────────────────────────────────
+function ensureCustomFilterTag() {
+  const row = document.querySelector('.filter-row');
+  if (!row || !customGames.length) return;
+  if (!row.querySelector('[data-filter="custom"]')) {
+    const tag = document.createElement('div');
+    tag.className = 'ftag';
+    tag.setAttribute('data-filter', 'custom');
+    tag.textContent = 'Custom';
+    tag.onclick = function() { setFilter('custom', this); };
+    row.appendChild(tag);
+  }
+}
+
+// Boot sequence
+initBackground();
+runBootsplash();
+init();
+</script>
+</body>
+</html>
