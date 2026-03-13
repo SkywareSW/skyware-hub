@@ -347,7 +347,7 @@ footer{
   <ul class="nav-links">
     <li><a href="#features">Features</a></li>
     <li><a href="#download">Download</a></li>
-    <li><a href="https://github.com/YOUR_USERNAME/skyware-hub" target="_blank">GitHub</a></li>
+    <li><a href="https://github.com/SkywareSW/skyware-hub" target="_blank">GitHub</a></li>
   </ul>
 </nav>
 
@@ -357,11 +357,11 @@ footer{
   <h1 class="h1"><span class="line1">SKYWARE</span><span class="line2">HUB</span></h1>
   <p class="hero-p">One launcher to rule them all. Steam, Epic, Minecraft, Hytale — and anything else you throw at it.</p>
   <div class="btns">
-    <a href="https://github.com/YOUR_USERNAME/skyware-hub/releases/latest" class="btn-dl" id="dl-hero">
+    <a href="https://github.com/SkywareSW/skyware-hub/releases/latest" class="btn-dl" id="dl-hero">
       <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Download for Windows
     </a>
-    <a href="https://github.com/YOUR_USERNAME/skyware-hub" target="_blank" class="btn-gh">
+    <a href="https://github.com/SkywareSW/skyware-hub" target="_blank" class="btn-gh">
       <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
       View on GitHub
     </a>
@@ -476,13 +476,13 @@ footer{
       <div class="dl-clabel">Latest Release</div>
       <div class="dl-cname">SKYWARE HUB SETUP</div>
       <div class="dl-cmeta" id="dl-meta">v1.0.0 &nbsp;·&nbsp; Windows x64 &nbsp;·&nbsp; NSIS Installer</div>
-      <a href="https://github.com/YOUR_USERNAME/skyware-hub/releases/latest" class="btn-dl" id="dl-card-btn" style="margin:0 auto">
+      <a href="https://github.com/SkywareSW/skyware-hub/releases/latest" class="btn-dl" id="dl-card-btn" style="margin:0 auto">
         <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Download .exe
       </a>
       <div class="dl-links">
-        <a href="https://github.com/YOUR_USERNAME/skyware-hub/releases" target="_blank">All Releases →</a>
-        <a href="https://github.com/YOUR_USERNAME/skyware-hub" target="_blank">Source Code →</a>
+        <a href="https://github.com/SkywareSW/skyware-hub/releases" target="_blank">All Releases →</a>
+        <a href="https://github.com/SkywareSW/skyware-hub" target="_blank">Source Code →</a>
       </div>
     </div>
   </div>
@@ -491,9 +491,9 @@ footer{
 <footer>
   <div class="flogo">SKYWARE HUB</div>
   <div class="flinks">
-    <a href="https://github.com/YOUR_USERNAME/skyware-hub" target="_blank">GitHub</a>
-    <a href="https://github.com/YOUR_USERNAME/skyware-hub/releases" target="_blank">Releases</a>
-    <a href="https://github.com/YOUR_USERNAME/skyware-hub/issues" target="_blank">Issues</a>
+    <a href="https://github.com/SkywareSW/skyware-hub" target="_blank">GitHub</a>
+    <a href="https://github.com/SkywareSW/skyware-hub/releases" target="_blank">Releases</a>
+    <a href="https://github.com/SkywareSW/skyware-hub/issues" target="_blank">Issues</a>
   </div>
   <div class="fcopy">© 2026 Skyware · MIT License</div>
 </footer>
@@ -564,7 +564,7 @@ revEls.forEach(el=>{
 // Fetch latest release from GitHub API
 (async()=>{
   try{
-    const r = await fetch('https://api.github.com/repos/YOUR_USERNAME/skyware-hub/releases/latest');
+    const r = await fetch('https://api.github.com/repos/SkywareSW/skyware-hub/releases/latest');
     if(!r.ok) return;
     const d = await r.json();
     const v = d.tag_name||'v1.0.0';
